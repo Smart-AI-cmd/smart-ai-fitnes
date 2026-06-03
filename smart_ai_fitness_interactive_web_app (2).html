@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART_AI FITNESS — Панель Воина</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Urbanist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyberDark: '#0B0E13',
+                        cyberDeep: '#05070a',
+                        electricBlue: '#00D4FF',
+                        neonGreen: '#39FF88',
+                        cyberAmber: '#FFB800',
+                        grayText: '#A0A8B8',
+                    },
+                    fontFamily: {
+                        sans: ['Urbanist', 'sans-serif'],
+                        comfortaa: ['Comfortaa', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Neon Glow Styles and Animations */
+        body {
+            background-color: #05070a;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.01) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .neo-glow-blue {
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.35);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        .neo-glow-green {
+            box-shadow: 0 0 15px rgba(57, 255, 136, 0.35);
+            border-color: rgba(57, 255, 136, 0.5);
+        }
+
+        .neo-glow-amber {
+            box-shadow: 0 0 15px rgba(255, 184, 0, 0.35);
+            border-color: rgba(255, 184, 0, 0.5);
+        }
+
+        .neo-text-glow-blue {
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+        }
+
+        .neo-text-glow-green {
+            text-shadow: 0 0 8px rgba(57, 255, 136, 0.6);
+        }
+
+        /* Webkit scrollbar customized for tactical cyber look */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00D4FF;
+            border-radius: 2px;
+        }
+
+        /* Pulse Animations */
+        @keyframes cyberPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+        .pulse-active {
+            animation: cyberPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            40% { transform: scale(1); }
+            60% { transform: scale(1.15); }
+        }
+        .heart-rate-pulse {
+            animation: heartBeat 0.8s infinite;
+        }
+
+        /* Glassmorphism tactical panels */
+        .glass-panel {
+            background: rgba(11, 14, 19, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        /* Phone frame layout wrapper */
+        .phone-viewport {
+            width: 412px;
+            height: 844px;
+            border-radius: 40px;
+            border: 10px solid #1e293b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 212, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            background-color: #0B0E13;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white flex flex-col items-center justify-center p-4 select-none">
+
+    <!-- Global Tactical Top Deck (Visible only on desktop screens for controlling simulation parameters) -->
+    <div class="hidden lg:flex w-full max-w-5xl mb-6 justify-between items-center glass-panel p-4 rounded-2xl border border-slate-800">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-electricBlue/10 flex items-center justify-center text-electricBlue neo-glow-blue border border-electricBlue/30">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-comfortaa font-bold text-lg tracking-wider text-white">SMART_AI <span class="text-electricBlue">FITNESS</span></h1>
+                <p class="text-xs text-grayText">ТАКТИЧЕСКИЙ СИМУЛЯТОР • КОНСОЛЬ РАЗРАБОТЧИКА v1.2</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- Custom Key Setting for Orion Live Chat -->
+            <div class="relative">
+                <span class="absolute -top-2 left-3 bg-cyberDeep px-2 text-[10px] text-electricBlue uppercase tracking-widest font-bold">API КЛЮЧ GEMINI</span>
+                <input id="gemini-key-input" type="password" oninput="saveApiKey()" placeholder="Введите API ключ для реального ИИ" 
+                       class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-electricBlue w-64 pt-3.5" />
+            </div>
+            
+            <button onclick="resetAppProgress()" class="px-4 py-2 bg-red-950/40 hover:bg-red-950 text-red-400 border border-red-800/60 rounded-lg text-xs transition duration-200">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Сбросить прогресс
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN SMARTPHONE WRAPPER -->
+    <div class="phone-viewport flex flex-col relative" id="phone-container">
+        
+        <!-- Phone Top Notch & Status Bar -->
+        <div class="absolute top-0 left-0 right-0 h-8 bg-black/40 z-50 flex justify-between items-center px-6 text-xs text-white">
+            <div class="font-semibold text-[11px] tracking-tight">9:41</div>
+            <!-- Physical Camera Notch Mockup -->
+            <div class="w-28 h-4 bg-black rounded-b-2xl absolute left-1/2 -translate-x-1/2 top-0"></div>
+            <div class="flex items-center gap-1.5 text-[10px]">
+                <i class="fa-solid fa-signal"></i>
+                <span class="font-bold">5G</span>
+                <i class="fa-solid fa-battery-three-quarters text-xs text-neonGreen"></i>
+            </div>
+        </div>
+
+        <!-- TACTICAL REGISTRATION & LOGIN SCREEN -->
+        <div id="screen-registration" class="absolute inset-0 bg-cyberDark z-40 flex flex-col justify-between pt-12 p-6 overflow-y-auto">
+            <div class="text-center mt-2">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-electricBlue/10 flex items-center justify-center text-electricBlue border border-electricBlue/30 mb-3 neo-glow-blue">
+                    <i class="fa-solid fa-user-shield text-2xl animate-pulse"></i>
+                </div>
+                <h2 class="font-comfortaa text-xl font-bold tracking-tight">ТАКТИЧЕСКИЙ <span class="text-electricBlue">ДОСТУП</span></h2>
+                <p class="text-[10px] text-grayText uppercase tracking-widest mt-1">Авторизация в системе ОРИОН</p>
+            </div>
+
+            <!-- Tabs for Reg / Login -->
+            <div class="flex gap-2 bg-slate-950 p-1 rounded-xl border border-slate-900 text-xs my-4">
+                <button id="tab-reg-btn" onclick="toggleRegTab('register')" class="flex-grow py-1.5 text-center rounded-lg bg-electricBlue text-black font-extrabold text-[10px] uppercase neo-glow-blue transition duration-200">Регистрация</button>
+                <button id="tab-login-btn" onclick="toggleRegTab('login')" class="flex-grow py-1.5 text-center rounded-lg text-grayText hover:text-white text-[10px] uppercase transition duration-200">Вход</button>
+            </div>
+
+            <!-- Registration Form Container -->
+            <div id="reg-form-container" class="space-y-3 flex-grow justify-center flex flex-col">
+                <!-- Email -->
+                <div>
+                    <label class="block text-[9px] text-electricBlue uppercase tracking-widest font-bold mb-1">Военный E-mail</label>
+                    <div class="relative flex items-center bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden p-1">
+                        <span class="pl-3 text-grayText"><i class="fa-solid fa-envelope text-xs"></i></span>
+                        <input id="reg-email" type="email" placeholder="soldier@orion.mil" oninput="validateRegistration()"
+                               class="w-full bg-transparent border-none px-3 py-2 text-xs text-white focus:outline-none" />
+                    </div>
+                </div>
+
+                <!-- Callsign/Name -->
+                <div>
+                    <label class="block text-[9px] text-electricBlue uppercase tracking-widest font-bold mb-1">Позывной / Имя</label>
+                    <div class="relative flex items-center bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden p-1">
+                        <span class="pl-3 text-grayText"><i class="fa-solid fa-user-tag text-xs"></i></span>
+                        <input id="reg-callsign" type="text" placeholder="СПЕКТР-12" oninput="validateRegistration()"
+                               class="w-full bg-transparent border-none px-3 py-2 text-xs text-white focus:outline-none" />
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-[9px] text-electricBlue uppercase tracking-widest font-bold mb-1">Шифр-Пароль (Мин. 6 символов)</label>
+                    <div class="relative flex items-center bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden p-1">
+                        <span class="pl-3 text-grayText"><i class="fa-solid fa-lock text-xs"></i></span>
+                        <input id="reg-password" type="password" placeholder="••••••••" oninput="validateRegistration()"
+                               class="w-full bg-transparent border-none px-3 py-2 text-xs text-white focus:outline-none" />
+                        <button onclick="togglePasswordVisibility('reg-password')" class="pr-2 text-grayText hover:text-white"><i class="fa-solid fa-eye text-xs"></i></button>
+                    </div>
+                    <!-- Strength Indicator -->
+                    <div class="flex gap-1 mt-1.5 items-center justify-between">
+                        <div class="flex gap-1 flex-grow pr-4">
+                            <div id="strength-bar-1" class="h-1 bg-slate-900 rounded-full flex-grow transition-colors duration-300"></div>
+                            <div id="strength-bar-2" class="h-1 bg-slate-900 rounded-full flex-grow transition-colors duration-300"></div>
+                            <div id="strength-bar-3" class="h-1 bg-slate-900 rounded-full flex-grow transition-colors duration-300"></div>
+                        </div>
+                        <span id="strength-label" class="text-[8px] text-grayText uppercase font-bold tracking-widest">НЕТ ДАННЫХ</span>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label class="block text-[9px] text-electricBlue uppercase tracking-widest font-bold mb-1">Подтвердите Шифр</label>
+                    <div class="relative flex items-center bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden p-1">
+                        <span class="pl-3 text-grayText"><i class="fa-solid fa-lock-open text-xs"></i></span>
+                        <input id="reg-confirm" type="password" placeholder="••••••••" oninput="validateRegistration()"
+                               class="w-full bg-transparent border-none px-3 py-2 text-xs text-white focus:outline-none" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Form Container (Hidden initially) -->
+            <div id="login-form-container" class="space-y-3 flex-grow justify-center flex flex-col hidden">
+                <!-- Email -->
+                <div>
+                    <label class="block text-[9px] text-electricBlue uppercase tracking-widest font-bold mb-1">Военный E-mail</label>
+                    <div class="relative flex items-center bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden p-1">
+                        <span class="pl-3 text-grayText"><i class="fa-solid fa-envelope text-xs"></i></span>
+                        <input id="login-email" type="email" placeholder="soldier@orion.mil" oninput="validateLogin()"
+                               class="w-full bg-transparent border-none px-3 py-2 text-xs text-white focus:outline-none" />
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-[9px] text-electricBlue uppercase tracking-widest font-bold mb-1">Шифр-Пароль</label>
+                    <div class="relative flex items-center bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden p-1">
+                        <span class="pl-3 text-grayText"><i class="fa-solid fa-lock text-xs"></i></span>
+                        <input id="login-password" type="password" placeholder="••••••••" oninput="validateLogin()"
+                               class="w-full bg-transparent border-none px-3 py-2 text-xs text-white focus:outline-none" />
+                        <button onclick="togglePasswordVisibility('login-password')" class="pr-2 text-grayText hover:text-white"><i class="fa-solid fa-eye text-xs"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cyber Terminal Diagnostics Logger -->
+            <div class="glass-panel p-2 rounded-xl bg-black/60 border border-slate-800/80 my-2 text-[10px] font-mono leading-relaxed space-y-1">
+                <span class="text-electricBlue font-bold block uppercase tracking-widest text-[8px] border-b border-slate-800/60 pb-1 mb-1">
+                    <i class="fa-solid fa-terminal mr-1"></i> Динамический терминал ОРИОН
+                </span>
+                <div id="terminal-status-log" class="text-grayText transition-all">
+                    [СИСТЕМА]: Ожидание ввода идентификационных контуров...
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="pt-2">
+                <button id="access-action-btn" onclick="submitAccessForm()" disabled
+                        class="w-full py-3.5 bg-slate-900 border border-slate-800 text-grayText rounded-xl font-bold tracking-wider transition text-xs flex items-center justify-center gap-2 cursor-not-allowed">
+                    <span>ИНИЦИАЛИЗИРОВАТЬ АККАУНТ</span> <i class="fa-solid fa-shield-halved"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ONBOARDING OVERLAY (Shows if user not set up) -->
+        <div id="screen-onboarding" class="absolute inset-0 bg-cyberDark z-40 flex flex-col justify-between pt-12 p-6 overflow-y-auto hidden">
+            <div class="text-center mt-4">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-electricBlue/10 flex items-center justify-center text-electricBlue border border-electricBlue/30 mb-4 neo-glow-blue">
+                    <i class="fa-solid fa-jet-fighter-up text-3xl"></i>
+                </div>
+                <h2 class="font-comfortaa text-2xl font-bold tracking-tight">ПУТЬ ВОИНА <span class="text-electricBlue">НАЧИНАЕТСЯ</span></h2>
+                <p class="text-xs text-grayText mt-2">ИИ Орион сгенерирует тактическую программу на базе параметров вашего тела</p>
+            </div>
+
+            <div class="space-y-4 my-6">
+                <div>
+                    <label class="block text-[10px] text-electricBlue uppercase tracking-widest font-bold mb-1">Ваше имя</label>
+                    <input id="ob-name" type="text" value="Андрей" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-electricBlue text-white" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-electricBlue uppercase tracking-widest font-bold mb-1">Возраст (лет)</label>
+                        <input id="ob-age" type="number" value="28" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-electricBlue text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-electricBlue uppercase tracking-widest font-bold mb-1">Пол</label>
+                        <select id="ob-gender" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-electricBlue text-white">
+                            <option value="male">Мужской</option>
+                            <option value="female">Женский</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-electricBlue uppercase tracking-widest font-bold mb-1">Рост (см)</label>
+                        <input id="ob-height" type="number" value="180" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-electricBlue text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-electricBlue uppercase tracking-widest font-bold mb-1">Вес (кг)</label>
+                        <input id="ob-weight" type="number" value="78" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-electricBlue text-white" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] text-electricBlue uppercase tracking-widest font-bold mb-1">Уровень подготовки</label>
+                    <select id="ob-level" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-electricBlue text-white">
+                        <option value="beginner">Новобранец (Минимальный)</option>
+                        <option value="middle" selected>Солдат (Средний)</option>
+                        <option value="advanced">Спецназ (Максимальный)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] text-electricBlue uppercase tracking-widest font-bold mb-1">Глобальная цель</label>
+                    <select id="ob-goal" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-electricBlue text-white">
+                        <option value="lose">Похудеть</option>
+                        <option value="gain">Набрать массу</option>
+                        <option value="power">Стать сильнее</option>
+                        <option value="endurance" selected>Развить выносливость</option>
+                        <option value="maintain">Поддерживать форму</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="submitOnboarding()" class="w-full py-4 bg-gradient-to-r from-electricBlue to-blue-600 rounded-xl font-bold tracking-wider hover:opacity-90 transition text-sm flex items-center justify-center gap-2 neo-glow-blue mb-4">
+                <span>ИНИЦИИРОВАТЬ ИИ-АНАЛИЗ</span> <i class="fa-solid fa-brain"></i>
+            </button>
+        </div>
+
+
+        <!-- SCREEN 1: MAIN (МИССИЯ) -->
+        <div id="screen-main" class="flex-grow flex flex-col justify-between pt-10 pb-20 px-4 overflow-y-auto space-y-4">
+            
+            <!-- User Info Top Bar -->
+            <div class="flex items-center justify-between mt-1">
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <img src="https://images.stockcake.com/public/9/9/f/99fc75f8-3839-4f54-988c-bc838a787d6c_large/neon-military-commander-stockcake.jpg" 
+                             class="w-11 h-11 rounded-full object-cover border-2 border-electricBlue neo-glow-blue" id="main-avatar-img" />
+                        <span class="absolute -bottom-1 -right-1 bg-neonGreen text-[8px] text-black font-extrabold px-1 rounded-full"><i class="fa-solid fa-circle-check"></i></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-bold text-sm tracking-wide" id="user-display-name">Андрей</span>
+                            <span id="user-display-callsign" class="text-[9px] bg-electricBlue/20 text-electricBlue border border-electricBlue/30 px-1 rounded font-mono font-bold">СПЕКТР-12</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-[10px] text-grayText">
+                            <span class="text-neonGreen uppercase font-bold" id="user-display-rank">СЕРЖАНТ</span>
+                            <span>•</span>
+                            <span id="user-display-lvl">Уровень 12</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="showOnboarding(true)" class="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-grayText hover:text-white transition">
+                        <i class="fa-solid fa-sliders text-xs"></i>
+                    </button>
+                    <div class="relative w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-electricBlue">
+                        <i class="fa-solid fa-bell text-xs"></i>
+                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-cyberAmber rounded-full border border-cyberDark"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Big Level up RPG Badge Progress -->
+            <div class="flex flex-col items-center justify-center py-4 relative">
+                <div class="relative w-56 h-56 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full border border-dashed border-electricBlue/20 animate-[spin_40s_linear_infinite]"></div>
+                    <div class="absolute inset-4 rounded-full border-2 border-electricBlue/10"></div>
+                    
+                    <svg class="absolute inset-2 w-52 h-52 transform -rotate-90">
+                        <circle cx="104" cy="104" r="92" stroke="rgba(11, 14, 19, 0.5)" stroke-width="6" fill="transparent" />
+                        <circle id="xp-progress-ring" cx="104" cy="104" r="92" stroke="#00D4FF" stroke-width="8" fill="transparent" 
+                                stroke-dasharray="578" stroke-dashoffset="180" stroke-linecap="round" class="transition-all duration-1000" />
+                    </svg>
+
+                    <div class="z-10 text-center">
+                        <div class="w-16 h-16 mx-auto mb-1 flex items-center justify-center">
+                            <i class="fa-solid fa-medal text-4xl text-electricBlue neo-text-glow-blue animate-bounce" id="rank-icon-big"></i>
+                        </div>
+                        <h3 class="font-comfortaa font-bold text-lg tracking-wide uppercase text-white" id="rank-display-title">СЕРЖАНТ</h3>
+                        <p class="text-[10px] text-electricBlue tracking-widest font-extrabold uppercase" id="lvl-display-title">УРОВЕНЬ 12</p>
+                        <div class="mt-1 px-3 py-0.5 rounded-full bg-slate-900/80 border border-slate-800 text-[10px] text-grayText">
+                            <span class="text-white font-bold" id="xp-display-text">1520</span> / <span id="xp-target-text">2500</span> XP
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Operational Name Plate -->
+            <div class="glass-panel rounded-xl p-2.5 border border-neonGreen/20 text-center text-xs">
+                <span class="text-[8px] text-neonGreen font-bold uppercase tracking-widest block">АКТИВНАЯ КУРС-ОПЕРАЦИЯ</span>
+                <span id="active-op-codename" class="font-comfortaa font-bold text-white text-sm neo-text-glow-green">ОПЕРАЦИЯ «СТАЛЬНОЙ КУЛАК»</span>
+            </div>
+
+            <!-- Warrior Metrics Attributes Widget -->
+            <div class="grid grid-cols-3 gap-3">
+                <div class="glass-panel rounded-2xl p-3 flex flex-col items-center text-center">
+                    <span class="text-electricBlue mb-1"><i class="fa-solid fa-dumbbell text-sm"></i></span>
+                    <span class="text-[9px] text-grayText uppercase font-bold tracking-widest">Сила</span>
+                    <span class="text-sm font-extrabold text-white mt-0.5" id="metric-strength">68%</span>
+                    <div class="w-full bg-slate-950 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                        <div id="metric-bar-strength" class="bg-electricBlue h-full" style="width: 68%"></div>
+                    </div>
+                </div>
+                
+                <div class="glass-panel rounded-2xl p-3 flex flex-col items-center text-center">
+                    <span class="text-cyberAmber mb-1"><i class="fa-solid fa-bolt text-sm"></i></span>
+                    <span class="text-[9px] text-grayText uppercase font-bold tracking-widest">Выносливость</span>
+                    <span class="text-sm font-extrabold text-white mt-0.5" id="metric-endurance">54%</span>
+                    <div class="w-full bg-slate-950 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                        <div id="metric-bar-endurance" class="bg-cyberAmber h-full" style="width: 54%"></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-3 flex flex-col items-center text-center">
+                    <span class="text-neonGreen mb-1"><i class="fa-solid fa-shield-halved text-sm"></i></span>
+                    <span class="text-[9px] text-grayText uppercase font-bold tracking-widest">Дисциплина</span>
+                    <span class="text-sm font-extrabold text-white mt-0.5" id="metric-discipline">82%</span>
+                    <div class="w-full bg-slate-950 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                        <div id="metric-bar-discipline" class="bg-neonGreen h-full" style="width: 82%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Streak Counter & Calendar Widget -->
+            <div class="glass-panel rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-fire text-cyberAmber text-base pulse-active"></i>
+                        <div>
+                            <span class="text-[10px] text-grayText uppercase font-bold tracking-wider block">Серия тренировок</span>
+                            <span class="text-sm font-extrabold text-white" id="streak-days-display">12 ДНЕЙ</span>
+                        </div>
+                    </div>
+                    <span class="text-[9px] bg-red-950/40 text-red-400 px-2 py-0.5 rounded-full border border-red-900/30 font-bold uppercase tracking-widest">
+                        Режим Спецназ: заблокирован
+                    </span>
+                </div>
+
+                <!-- Checked Days row (Mon-Sun) -->
+                <div class="grid grid-cols-7 gap-1.5 text-center">
+                    <div class="flex flex-col items-center">
+                        <span class="text-[9px] text-grayText font-bold uppercase mb-1">Пн</span>
+                        <div class="w-7 h-7 rounded-lg bg-neonGreen/10 border border-neonGreen/40 flex items-center justify-center text-neonGreen text-[10px]">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[9px] text-grayText font-bold uppercase mb-1">Вт</span>
+                        <div class="w-7 h-7 rounded-lg bg-neonGreen/10 border border-neonGreen/40 flex items-center justify-center text-neonGreen text-[10px]">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[9px] text-grayText font-bold uppercase mb-1">Ср</span>
+                        <div class="w-7 h-7 rounded-lg bg-neonGreen/10 border border-neonGreen/40 flex items-center justify-center text-neonGreen text-[10px]">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[9px] text-grayText font-bold uppercase mb-1">Чт</span>
+                        <div class="w-7 h-7 rounded-lg bg-neonGreen/10 border border-neonGreen/40 flex items-center justify-center text-neonGreen text-[10px]">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[9px] text-grayText font-bold uppercase mb-1">Пт</span>
+                        <div class="w-7 h-7 rounded-lg bg-neonGreen/10 border border-neonGreen/40 flex items-center justify-center text-neonGreen text-[10px]">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[9px] text-grayText font-bold uppercase mb-1">Сб</span>
+                        <div class="w-7 h-7 rounded-lg bg-neonGreen/10 border border-neonGreen/40 flex items-center justify-center text-neonGreen text-[10px]">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[9px] text-grayText font-bold uppercase mb-1">Вс</span>
+                        <div class="w-7 h-7 rounded-lg bg-slate-900 border border-slate-700/80 flex items-center justify-center text-cyberAmber text-[10px]">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Big Glow Mission Trigger -->
+            <button onclick="switchTab('tab-mission-of-day')" class="w-full py-4 bg-gradient-to-r from-electricBlue to-blue-600 hover:opacity-95 text-white font-comfortaa font-bold tracking-widest text-sm rounded-2xl flex items-center justify-center gap-2 neo-glow-blue group transition duration-300">
+                <i class="fa-solid fa-bolt text-sm pulse-active"></i>
+                <span>НАЧАТЬ МИССИЮ ДНЯ</span>
+                <i class="fa-solid fa-angle-right text-xs group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+
+
+        <!-- SCREEN 2: MISSION OF THE DAY (МИССИЯ ДНЯ) -->
+        <div id="screen-daily" class="flex-grow flex flex-col justify-between pt-10 pb-20 px-4 overflow-y-auto space-y-4 hidden">
+            
+            <!-- Daily Mission Info Block -->
+            <div class="mt-2 text-center">
+                <span class="text-[10px] bg-electricBlue/10 text-electricBlue px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-electricBlue/20 inline-block">
+                    ДЕНЬ <span id="mission-current-day">12</span> ИЗ 28
+                </span>
+                <h2 class="font-comfortaa font-bold text-2xl tracking-wide mt-2">МИССИЯ ДНЯ</h2>
+                <p class="text-[11px] text-grayText mt-1 uppercase tracking-wider" id="user-goal-mission-subtitle">Твоя цель — стать лучшей версией себя</p>
+            </div>
+
+            <!-- Exercises list -->
+            <div class="space-y-3" id="daily-exercises-list">
+                <!-- Programmatic list generated dynamically via state -->
+            </div>
+
+            <!-- Complete Mission Action Button with hold capability -->
+            <div class="pt-4">
+                <button id="complete-mission-main-btn" onclick="triggerCompleteMission()" class="w-full py-4 bg-gradient-to-r from-neonGreen to-emerald-600 text-black font-comfortaa font-bold tracking-widest text-sm rounded-2xl flex items-center justify-center gap-2 neo-glow-green opacity-50 cursor-not-allowed" disabled>
+                    <i class="fa-solid fa-circle-check text-lg"></i>
+                    <span>МИССИЯ ВЫПОЛНЕНА</span>
+                </button>
+                <p class="text-center text-[10px] text-grayText mt-2" id="mission-completion-hint">Выполните все упражнения, чтобы закрыть миссию дня и получить 100 XP</p>
+            </div>
+        </div>
+
+
+        <!-- SCREEN 3: PATH OF THE WARRIOR (ПУТЬ ВОИНА) -->
+        <div id="screen-path" class="flex-grow flex flex-col justify-between pt-10 pb-20 px-4 overflow-y-auto space-y-4 hidden">
+            
+            <div class="mt-2 text-center">
+                <h2 class="font-comfortaa font-bold text-2xl tracking-wide">ПУТЬ ВОИНА</h2>
+                <p class="text-xs text-grayText">Ваша карьерная лестница и разблокированные ранги</p>
+            </div>
+
+            <!-- Interactive Rank Map -->
+            <div class="relative py-4 px-6 flex-grow">
+                <div class="absolute top-0 bottom-0 left-[35px] w-1 bg-gradient-to-b from-emerald-500 via-electricBlue to-slate-800"></div>
+
+                <!-- Path items -->
+                <div class="space-y-8 relative" id="warrior-path-container">
+                    
+                    <!-- Soldier (Lvl 8) - Completed -->
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-12 h-12 rounded-full bg-slate-900 border-2 border-neonGreen flex items-center justify-center text-neonGreen z-10 neo-glow-green">
+                            <i class="fa-solid fa-check text-sm"></i>
+                        </div>
+                        <div class="glass-panel flex-grow p-3 rounded-2xl flex items-center justify-between border-l-4 border-l-neonGreen">
+                            <div>
+                                <h4 class="font-bold text-sm text-white">СОЛДАТ</h4>
+                                <p class="text-[10px] text-neonGreen uppercase font-bold tracking-wider">Уровень 8 • Достигнут</p>
+                            </div>
+                            <span class="text-xs text-grayText"><i class="fa-solid fa-circle-check text-neonGreen"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Sergeant (Lvl 12) - Active / Current -->
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-12 h-12 rounded-full bg-slate-900 border-2 border-electricBlue flex items-center justify-center text-electricBlue z-10 neo-glow-blue pulse-active">
+                            <i class="fa-solid fa-medal text-sm animate-pulse"></i>
+                        </div>
+                        <div class="glass-panel flex-grow p-3 rounded-2xl flex items-center justify-between border-l-4 border-l-electricBlue bg-slate-900/40">
+                            <div>
+                                <h4 class="font-bold text-sm text-white">СЕРЖАНТ</h4>
+                                <p class="text-[10px] text-electricBlue uppercase font-bold tracking-wider" id="sergeant-path-desc">Уровень 12 • Текущий ранг</p>
+                            </div>
+                            <span class="text-[10px] text-electricBlue font-bold animate-pulse">АКТИВЕН</span>
+                        </div>
+                    </div>
+
+                    <!-- Lieutenant (Lvl 16) - Locked -->
+                    <div class="flex items-center gap-4 group opacity-50 transition hover:opacity-80 cursor-pointer" onclick="showRankRequirement('ЛЕЙТЕНАНТ', 16, 'Эксклюзивный значок ветерана и улучшенные характеристики выносливости')">
+                        <div class="w-12 h-12 rounded-full bg-slate-950 border-2 border-slate-800 flex items-center justify-center text-slate-600 z-10">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </div>
+                        <div class="glass-panel flex-grow p-3 rounded-2xl flex items-center justify-between border-l-4 border-l-slate-700">
+                            <div>
+                                <h4 class="font-bold text-sm text-grayText">ЛЕЙТЕНАНТ</h4>
+                                <p class="text-[10px] text-grayText uppercase font-bold tracking-wider">Уровень 16 • Блокировано</p>
+                            </div>
+                            <span class="text-xs text-slate-600"><i class="fa-solid fa-lock"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Captain (Lvl 20) - Locked -->
+                    <div class="flex items-center gap-4 group opacity-50 transition hover:opacity-80 cursor-pointer" onclick="showRankRequirement('КАПИТАН', 20, 'Открывает режим суровых круговых тренировок и скин Тактического Аватара')">
+                        <div class="w-12 h-12 rounded-full bg-slate-950 border-2 border-slate-800 flex items-center justify-center text-slate-600 z-10">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </div>
+                        <div class="glass-panel flex-grow p-3 rounded-2xl flex items-center justify-between border-l-4 border-l-slate-700">
+                            <div>
+                                <h4 class="font-bold text-sm text-grayText">КАПИТАН</h4>
+                                <p class="text-[10px] text-grayText uppercase font-bold tracking-wider">Уровень 20 • Блокировано</p>
+                            </div>
+                            <span class="text-xs text-slate-600"><i class="fa-solid fa-lock"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- General (Lvl 30) - Locked -->
+                    <div class="flex items-center gap-4 group opacity-50 transition hover:opacity-80 cursor-pointer" onclick="showRankRequirement('ГЕНЕРАЛ', 30, 'Высший ранг воина. Абсолютный статус в глобальной таблице лидеров')">
+                        <div class="w-12 h-12 rounded-full bg-slate-950 border-2 border-slate-800 flex items-center justify-center text-slate-600 z-10">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </div>
+                        <div class="glass-panel flex-grow p-3 rounded-2xl flex items-center justify-between border-l-4 border-l-slate-700">
+                            <div>
+                                <h4 class="font-bold text-sm text-grayText">ГЕНЕРАЛ</h4>
+                                <p class="text-[10px] text-grayText uppercase font-bold tracking-wider">Уровень 30 • Блокировано</p>
+                            </div>
+                            <span class="text-xs text-slate-600"><i class="fa-solid fa-lock"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail modal requirement block -->
+            <div id="rank-requirement-toast" class="glass-panel p-3.5 rounded-2xl text-xs space-y-1 bg-slate-900 border border-electricBlue/20 text-center hidden">
+                <span class="text-electricBlue font-bold" id="req-title">КАПИТАН</span> требует <span class="text-white font-bold" id="req-lvl">20 уровень</span>.
+                <p class="text-[10px] text-grayText" id="req-reward">Открывает новые возможности.</p>
+            </div>
+        </div>
+
+
+        <!-- SCREEN 4: PROGRESS & ANALYTICS (ПРОГРЕСС) -->
+        <div id="screen-progress" class="flex-grow flex flex-col justify-between pt-10 pb-20 px-4 overflow-y-auto space-y-4 hidden">
+            
+            <div class="mt-2 text-center">
+                <h2 class="font-comfortaa font-bold text-2xl tracking-wide">ПРОГРЕСС</h2>
+                <p class="text-xs text-grayText">Аналитика тактической активности и состава тела</p>
+            </div>
+
+            <!-- Time Filters Row -->
+            <div class="flex gap-2 justify-between bg-slate-950 p-1 rounded-xl border border-slate-900 text-xs">
+                <button class="flex-grow py-1.5 text-center rounded-lg bg-slate-900 text-white font-bold text-[10px] uppercase">7 Дней</button>
+                <button class="flex-grow py-1.5 text-center rounded-lg bg-electricBlue text-black font-extrabold text-[10px] uppercase neo-glow-blue">28 Дней</button>
+                <button class="flex-grow py-1.5 text-center rounded-lg text-grayText hover:text-white text-[10px] uppercase">90 Дней</button>
+                <button class="flex-grow py-1.5 text-center rounded-lg text-grayText hover:text-white text-[10px] uppercase">Год</button>
+            </div>
+
+            <!-- Key metrics cards grid (workouts, time, cal, streak) -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-electricBlue/10 flex items-center justify-center text-electricBlue border border-electricBlue/20">
+                        <i class="fa-solid fa-dumbbell"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-grayText uppercase font-bold tracking-wider block">Тренировки</span>
+                        <span class="text-base font-extrabold text-white" id="stat-workouts-count">18</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyberAmber/10 flex items-center justify-center text-cyberAmber border border-cyberAmber/20">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-grayText uppercase font-bold tracking-wider block">Время</span>
+                        <span class="text-base font-extrabold text-white">7ч 24м</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 border border-red-500/20">
+                        <i class="fa-solid fa-fire-flame-simple"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-grayText uppercase font-bold tracking-wider block">Калории</span>
+                        <span class="text-base font-extrabold text-white">5120 ккал</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-neonGreen/10 flex items-center justify-center text-neonGreen border border-neonGreen/20">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-grayText uppercase font-bold tracking-wider block">Серия</span>
+                        <span class="text-base font-extrabold text-white" id="stat-streak-display">12 дней</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Muscle groups updates -->
+            <div class="glass-panel rounded-2xl p-4 space-y-3">
+                <span class="text-[10px] text-electricBlue uppercase font-extrabold tracking-widest block">Изменения тела</span>
+                
+                <div class="space-y-2">
+                    <!-- chest -->
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold">Грудь</span>
+                        <span class="text-neonGreen font-bold font-comfortaa">+12%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-electricBlue to-neonGreen h-full rounded-full" style="width: 78%"></div>
+                    </div>
+
+                    <!-- back -->
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold">Спина</span>
+                        <span class="text-neonGreen font-bold font-comfortaa">+15%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-electricBlue to-neonGreen h-full rounded-full" style="width: 82%"></div>
+                    </div>
+
+                    <!-- arms -->
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold">Руки</span>
+                        <span class="text-neonGreen font-bold font-comfortaa">+10%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-electricBlue to-neonGreen h-full rounded-full" style="width: 65%"></div>
+                    </div>
+
+                    <!-- core -->
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold">Пресс</span>
+                        <span class="text-neonGreen font-bold font-comfortaa">+24%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-electricBlue to-neonGreen h-full rounded-full" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weight tracker dynamic chart -->
+            <div class="glass-panel rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <span class="text-[10px] text-grayText uppercase font-bold block">Динамика веса</span>
+                        <span class="text-sm font-extrabold text-white" id="user-current-weight-val">78.5 кг <span class="text-xs text-grayText font-normal">(Текущий)</span></span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-neonGreen font-bold block">-2.5 кг</span>
+                        <span class="text-[9px] text-grayText">за 28 дней</span>
+                    </div>
+                </div>
+
+                <div class="w-full h-24 bg-slate-950/60 rounded-xl relative overflow-hidden flex items-end">
+                    <svg class="w-full h-full" viewBox="0 0 300 80">
+                        <defs>
+                            <linearGradient id="weight-grad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#00D4FF" stop-opacity="0.3"></stop>
+                                <stop offset="100%" stop-color="#00D4FF" stop-opacity="0"></stop>
+                            </linearGradient>
+                        </defs>
+                        <!-- Grid lines -->
+                        <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(255, 255, 255, 0.05)" stroke-dasharray="2 2" />
+                        <line x1="0" y1="40" x2="300" y2="40" stroke="rgba(255, 255, 255, 0.05)" stroke-dasharray="2 2" />
+                        <line x1="0" y1="60" x2="300" y2="60" stroke="rgba(255, 255, 255, 0.05)" stroke-dasharray="2 2" />
+                        
+                        <!-- Smooth weight path line -->
+                        <path d="M 10 30 Q 80 45, 150 25 T 290 65" fill="none" stroke="#00D4FF" stroke-width="3" />
+                        <path d="M 10 30 Q 80 45, 150 25 T 290 65 L 290 80 L 10 80 Z" fill="url(#weight-grad)" />
+                        
+                        <!-- Weight points -->
+                        <circle cx="10" cy="30" r="4" fill="#39FF88" />
+                        <circle cx="150" cy="25" r="4" fill="#00D4FF" />
+                        <circle cx="290" cy="65" r="4" fill="#00D4FF" class="animate-ping" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- SCREEN 5: AI COMMANDER ORION (AI КОМАНДИР) -->
+        <div id="screen-commander" class="flex-grow flex flex-col justify-between pt-10 pb-20 px-4 overflow-hidden hidden">
+            
+            <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3 mt-2">
+                <div class="relative">
+                    <img src="https://images.stockcake.com/public/9/9/f/99fc75f8-3839-4f54-988c-bc838a787d6c_large/neon-military-commander-stockcake.jpg" 
+                         class="w-12 h-12 rounded-xl object-cover border-2 border-electricBlue neo-glow-blue" />
+                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-neonGreen border-2 border-cyberDark rounded-full animate-pulse"></span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-sm tracking-wide">КОМАНДИР ORION</span>
+                        <i class="fa-solid fa-circle-check text-electricBlue text-[11px]"></i>
+                    </div>
+                    <p class="text-[10px] text-neonGreen font-bold uppercase tracking-wider">Твой личный AI-наставник</p>
+                </div>
+            </div>
+
+            <!-- Message Area Scroll Container -->
+            <div class="flex-grow overflow-y-auto py-4 space-y-3 pr-1 text-xs" id="chat-messages-container">
+                <div class="flex flex-col space-y-1 max-w-[85%] self-start">
+                    <span class="text-[9px] text-electricBlue uppercase font-bold pl-2">ORION</span>
+                    <div class="glass-panel p-3 rounded-2xl rounded-tl-none border border-slate-800 text-white">
+                        Здравствуй, Андрей. Твой ранг — Сержант. Твоя дисциплина на высоком уровне. Сегодня нагрузка была оптимальной. Готов к следующему шагу?
+                    </div>
+                    <span class="text-[8px] text-grayText pl-2">09:30</span>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-3">
+                <div class="flex gap-2 overflow-x-auto pb-1 text-[10px]">
+                    <button onclick="sendQuickReply('Сегодня устал, мало энергии')" class="whitespace-nowrap px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-electricBlue rounded-full text-grayText hover:text-white transition duration-200">
+                        Сегодня устал, мало энергии
+                    </button>
+                    <button onclick="sendQuickReply('Предложи план тренировки на завтра')" class="whitespace-nowrap px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-electricBlue rounded-full text-grayText hover:text-white transition duration-200">
+                        Предложи план на завтра
+                    </button>
+                    <button onclick="sendQuickReply('Как повысить силу быстрее?')" class="whitespace-nowrap px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-electricBlue rounded-full text-grayText hover:text-white transition duration-200">
+                        Как повысить силу?
+                    </button>
+                </div>
+
+                <div class="relative flex items-center bg-slate-950/80 border border-slate-800 focus-within:border-electricBlue rounded-2xl overflow-hidden p-1">
+                    <input id="chat-input-field" type="text" placeholder="Напиши командиру..." class="flex-grow bg-transparent px-3 py-2 text-xs text-white focus:outline-none" onkeypress="handleChatKeyPress(event)" />
+                    <button onclick="sendUserMessage()" class="w-8 h-8 rounded-xl bg-electricBlue hover:opacity-95 text-black flex items-center justify-center transition neo-glow-blue">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- IMMERSIVE ACTIVE WORKOUT SCREEN -->
+        <div id="screen-workout" class="absolute inset-0 bg-cyberDark z-50 flex flex-col justify-between pt-12 p-6 overflow-y-auto hidden">
+            
+            <div class="flex items-center justify-between">
+                <button onclick="exitActiveWorkout()" class="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-grayText hover:text-white transition">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+                <div class="text-center">
+                    <span id="workout-exercise-title" class="font-bold text-sm block uppercase tracking-wide">ОТЖИМАНИЯ</span>
+                    <span id="workout-set-display" class="text-[10px] text-electricBlue uppercase font-bold tracking-widest">ПОДХОД 1 ИЗ 4</span>
+                </div>
+                <button onclick="toggleWorkoutSpeech()" id="workout-audio-toggle" class="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-electricBlue transition">
+                    <i class="fa-solid fa-volume-high text-xs" id="workout-audio-icon"></i>
+                </button>
+            </div>
+
+            <!-- Central progress circle tracker -->
+            <div class="flex flex-col items-center justify-center relative my-4">
+                <div class="relative w-56 h-56 flex items-center justify-center">
+                    <div class="absolute inset-2 rounded-full border-4 border-electricBlue/10"></div>
+                    
+                    <svg class="absolute inset-0 w-56 h-56 transform -rotate-90">
+                        <circle cx="112" cy="112" r="98" stroke="rgba(11, 14, 19, 0.4)" stroke-width="6" fill="transparent" />
+                        <circle id="workout-progress-ring" cx="112" cy="112" r="98" stroke="#00D4FF" stroke-width="10" fill="transparent" 
+                                stroke-dasharray="615" stroke-dashoffset="615" stroke-linecap="round" class="transition-all duration-300" />
+                    </svg>
+
+                    <div class="z-10 text-center">
+                        <span class="text-5xl font-extrabold font-comfortaa block text-white neo-text-glow-blue" id="workout-big-counter">15</span>
+                        <span class="text-[9px] text-grayText uppercase font-bold tracking-widest block mt-1" id="workout-unit-label">ПОВТОРЕНИЙ</span>
+                        <span class="text-xs text-neonGreen font-bold block mt-2" id="workout-done-target-ratio">0 / 15</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Posture Analysis Widget integrated directly into the training loop -->
+            <div class="glass-panel p-3.5 rounded-2xl border border-electricBlue/20 space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] text-electricBlue font-bold uppercase tracking-widest block"><i class="fa-solid fa-video mr-1"></i> ИИ КОНТРОЛЬ ОСАНКИ</span>
+                    <span class="bg-electricBlue/10 text-electricBlue text-[8px] font-mono font-bold px-1.5 py-0.5 rounded">GEMINI-3.1-IMAGE</span>
+                </div>
+                <p class="text-[10px] text-grayText">Загрузите или сделайте фото осанки. Наш ИИ проверит геометрию вашего тела в реальном времени.</p>
+                <div class="flex gap-2">
+                    <button onclick="openPostureModal()" class="flex-grow py-2 bg-electricBlue/10 hover:bg-electricBlue hover:text-black border border-electricBlue/30 text-electricBlue font-bold text-xs rounded-xl transition duration-200">
+                        <i class="fa-solid fa-camera mr-1"></i> Проверить Осанку ИИ
+                    </button>
+                </div>
+                <!-- Mini feedback box -->
+                <div id="posture-mini-feedback" class="hidden text-[10px] bg-slate-950/80 p-2 rounded-xl border border-slate-900 text-neonGreen">
+                    <!-- AI Critique output -->
+                </div>
+            </div>
+
+            <!-- Dynamic Tips block -->
+            <div class="glass-panel p-3.5 rounded-2xl space-y-2 mt-2">
+                <span class="text-[9px] text-electricBlue font-bold uppercase tracking-widest block"><i class="fa-solid fa-bolt mr-1"></i> ТЕХНИКА</span>
+                <p id="workout-tip-text" class="text-[11px] text-grayText">Держите спину ровно, локти под углом 45 градусов. Не торопитесь.</p>
+                
+                <div class="w-full h-10 bg-slate-950/40 rounded-xl flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-electricBlue/5 to-transparent animate-[pulse_1.5s_infinite]"></div>
+                    <div class="flex gap-1 items-end justify-center h-5">
+                        <div class="w-1 bg-electricBlue/40 rounded-full animate-[bounce_1s_infinite]"></div>
+                        <div class="w-1 bg-electricBlue/70 rounded-full animate-[bounce_1.2s_infinite]"></div>
+                        <div class="w-1 bg-electricBlue rounded-full animate-[bounce_0.8s_infinite]"></div>
+                        <div class="w-1 bg-neonGreen rounded-full animate-[bounce_1.1s_infinite]"></div>
+                        <div class="w-1 bg-electricBlue/80 rounded-full animate-[bounce_0.9s_infinite]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs px-2 mt-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-grayText text-[10px]">ОТДЫХ</span>
+                    <span id="workout-rest-timer" class="font-extrabold text-white text-sm">00:30</span>
+                </div>
+
+                <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1 rounded-full">
+                    <i class="fa-solid fa-heart text-red-500 heart-rate-pulse"></i>
+                    <span class="text-grayText text-[10px] font-bold">ПУЛЬС</span>
+                    <span id="workout-pulse-rate" class="font-extrabold text-red-400">128</span>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="grid grid-cols-3 gap-3 items-center pt-2">
+                <button onclick="toggleWorkoutPause()" id="workout-pause-btn" class="py-3 bg-slate-900 border border-slate-800 hover:border-electricBlue rounded-2xl text-white font-bold text-xs uppercase tracking-wider transition">
+                    <i class="fa-solid fa-pause text-base"></i>
+                </button>
+
+                <button onclick="incrementWorkoutRep()" class="py-3 bg-gradient-to-r from-electricBlue to-blue-600 rounded-2xl text-black font-extrabold text-sm uppercase tracking-widest neo-glow-blue flex flex-col items-center justify-center leading-tight">
+                    <span class="text-base font-black">+1</span>
+                    <span class="text-[8px] tracking-normal font-bold">ЖАТЬ</span>
+                </button>
+
+                <button onclick="finishWorkoutExercise()" class="py-3 bg-red-950/40 border border-red-900/50 rounded-2xl text-red-400 font-bold text-xs uppercase tracking-wider transition">
+                    <i class="fa-solid fa-check-double text-base"></i>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- POSTURE MODAL PANEL (MODERN SCI-FI SLIDEOVER) -->
+        <div id="modal-posture-checker" class="absolute inset-0 bg-cyberDark/95 z-50 flex flex-col justify-between pt-12 p-6 hidden">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-comfortaa font-bold text-sm text-white">ТАКТИЧЕСКИЙ ИИ-АНАЛИЗ ОСАНКИ</h3>
+                <button onclick="closePostureModal()" class="text-grayText hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="flex-grow flex flex-col justify-center items-center my-4 space-y-4">
+                <!-- Camera / Image Preview Container -->
+                <div class="relative w-full aspect-video rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden">
+                    <video id="posture-webcam" class="hidden w-full h-full object-cover" autoplay playsinline></video>
+                    <img id="posture-preview-img" class="hidden w-full h-full object-cover" />
+                    <div id="posture-placeholder" class="text-center p-4">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-electricBlue mb-2"></i>
+                        <p class="text-xs text-grayText">Сделайте снимок или загрузите фото выполнения упражнения</p>
+                    </div>
+                    <!-- Sci-fi Overlay Lines -->
+                    <div class="absolute inset-x-0 top-1/2 h-0.5 bg-electricBlue/20 animate-pulse"></div>
+                    <div class="absolute inset-y-0 left-1/2 w-0.5 bg-electricBlue/20 animate-pulse"></div>
+                </div>
+
+                <!-- Template Selector for Demo (Realistic SVG mock visuals representing postural mechanics) -->
+                <div class="w-full">
+                    <span class="text-[9px] text-grayText uppercase font-bold tracking-widest block mb-2">Тактические шаблоны геометрии тела:</span>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="selectPostureTemplate('good_pushup')" class="p-2 bg-slate-900 border border-slate-800 rounded-xl text-[10px] text-left hover:border-neonGreen transition">
+                            <span class="text-neonGreen font-bold block"><i class="fa-solid fa-check-double mr-1"></i> Отжимание</span>
+                            <span class="text-grayText text-[8px]">Идеальная планка</span>
+                        </button>
+                        <button onclick="selectPostureTemplate('bad_squat')" class="p-2 bg-slate-900 border border-slate-800 rounded-xl text-[10px] text-left hover:border-cyberAmber transition">
+                            <span class="text-cyberAmber font-bold block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Приседание</span>
+                            <span class="text-grayText text-[8px]">Круглая спина</span>
+                        </button>
+                        <button onclick="selectPostureTemplate('bad_plank')" class="p-2 bg-slate-900 border border-slate-800 rounded-xl text-[10px] text-left hover:border-red-500 transition">
+                            <span class="text-red-500 font-bold block"><i class="fa-solid fa-circle-xmark mr-1"></i> Планка</span>
+                            <span class="text-grayText text-[8px]">Провис таза</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden file upload for custom file input -->
+                <input type="file" id="posture-file-input" accept="image/*" class="hidden" onchange="handlePostureFileSelect(event)" />
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex gap-2">
+                    <button onclick="document.getElementById('posture-file-input').click()" class="flex-grow py-3 bg-slate-900 hover:bg-slate-850 text-white text-xs font-bold rounded-xl border border-slate-800 transition">
+                        <i class="fa-solid fa-file-image mr-1"></i> Выбрать файл
+                    </button>
+                    <button id="posture-camera-trigger-btn" onclick="startCameraCapture()" class="flex-grow py-3 bg-slate-900 hover:bg-slate-850 text-white text-xs font-bold rounded-xl border border-slate-800 transition">
+                        <i class="fa-solid fa-camera mr-1"></i> Камера
+                    </button>
+                </div>
+                <button id="btn-posture-analyze" onclick="runPostureAnalysis()" class="w-full py-4 bg-gradient-to-r from-neonGreen to-emerald-600 text-black font-comfortaa font-bold tracking-widest text-sm rounded-xl hover:opacity-95 transition neo-glow-green">
+                    НАЧАТЬ ИИ-ДЕШИФРОВКУ
+                </button>
+            </div>
+        </div>
+
+
+        <!-- SUCCESS POPUP / MISSION COMPLETE -->
+        <div id="popup-success-glow" class="absolute inset-0 bg-cyberDark/95 z-50 flex flex-col items-center justify-center p-6 text-center transition-all duration-500 hidden">
+            <div class="w-20 h-20 rounded-full bg-neonGreen/10 border-2 border-neonGreen flex items-center justify-center text-neonGreen mb-4 neo-glow-green animate-bounce">
+                <i class="fa-solid fa-circle-check text-4xl"></i>
+            </div>
+            
+            <h2 class="font-comfortaa text-2xl font-bold tracking-wide text-white">МИССИЯ <span class="text-neonGreen">ВЫПОЛНЕНА</span></h2>
+            <p class="text-xs text-grayText mt-1 max-w-xs" id="popup-success-desc">Ваш ежедневный лимит тренировочных нормативов успешно закрыт.</p>
+            
+            <!-- Dynamic AI Debrief Card -->
+            <div class="glass-panel p-3.5 rounded-2xl border border-electricBlue/20 text-left space-y-1.5 mt-3 max-w-sm w-full">
+                <span class="text-[9px] text-electricBlue font-bold uppercase tracking-widest block"><i class="fa-solid fa-comment-medical mr-1"></i> Рапорт Командира Ориона (ИИ)</span>
+                <div id="ai-debrief-loader" class="flex gap-1 py-1 hidden">
+                    <span class="w-1 h-1 bg-electricBlue rounded-full animate-bounce"></span>
+                    <span class="w-1 h-1 bg-electricBlue rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-1 h-1 bg-electricBlue rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                </div>
+                <p id="ai-debrief-text" class="text-[10px] text-grayText leading-normal">Для генерации детального рапорта командира введите API ключ в консоли разработчика.</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 w-full max-w-sm my-4 text-xs">
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <span class="text-neonGreen font-bold block text-sm">+100</span>
+                    <span class="text-[8px] text-grayText uppercase">ОПЫТ (XP)</span>
+                </div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <span class="text-cyberAmber font-bold block text-sm">+1</span>
+                    <span class="text-[8px] text-grayText uppercase">ДЕНЬ СЕРИИ</span>
+                </div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <span class="text-electricBlue font-bold block text-sm">+5%</span>
+                    <span class="text-[8px] text-grayText uppercase">ДИСЦИПЛИНА</span>
+                </div>
+            </div>
+
+            <button onclick="closeSuccessPopup()" class="w-full max-w-xs py-4 bg-gradient-to-r from-neonGreen to-emerald-600 text-black font-comfortaa font-bold tracking-widest text-sm rounded-xl hover:opacity-95 transition neo-glow-green">
+                ПРОДОЛЖИТЬ ПУТЬ
+            </button>
+        </div>
+
+
+        <!-- GLOBAL SYSTEM LOADER / ORCHESTRATION -->
+        <div id="ai-onboarding-loader" class="absolute inset-0 bg-cyberDark/95 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
+            <div class="relative w-20 h-20 mb-6">
+                <div class="absolute inset-0 rounded-full border-4 border-dashed border-electricBlue animate-[spin_8s_linear_infinite]"></div>
+                <div class="absolute inset-2 rounded-full border-2 border-neonGreen animate-[pulse_2s_infinite] flex items-center justify-center">
+                    <i class="fa-solid fa-microchip text-2xl text-electricBlue"></i>
+                </div>
+            </div>
+            <h3 class="font-comfortaa text-base font-bold text-white tracking-widest">ОРКЕСТРАЦИЯ ИИ КУРСА</h3>
+            <p class="text-xs text-grayText mt-2 max-w-xs">Командир ORION вычисляет тактические коэффициенты вашего тела и составляет боевую программу тренировок...</p>
+        </div>
+
+
+        <!-- BOTTOM NAVIGATION TABS BAR -->
+        <div class="absolute bottom-0 left-0 right-0 h-16 bg-[#0B0E13]/90 backdrop-filter backdrop-blur-lg border-t border-slate-800/80 z-30 flex justify-around items-center px-2">
+            
+            <button id="nav-tab-main" onclick="switchTab('tab-main')" class="flex flex-col items-center gap-1 text-electricBlue transition-all">
+                <i class="fa-solid fa-shield-halved text-base"></i>
+                <span class="text-[9px] font-bold tracking-wider">МИССИЯ</span>
+            </button>
+
+            <button id="nav-tab-path" onclick="switchTab('tab-path')" class="flex flex-col items-center gap-1 text-grayText hover:text-white transition-all">
+                <i class="fa-solid fa-route text-base"></i>
+                <span class="text-[9px] font-bold tracking-wider">ПУТЬ</span>
+            </button>
+
+            <button id="nav-tab-progress" onclick="switchTab('tab-progress')" class="flex flex-col items-center gap-1 text-grayText hover:text-white transition-all">
+                <i class="fa-solid fa-chart-line text-base"></i>
+                <span class="text-[9px] font-bold tracking-wider">ПРОГРЕСС</span>
+            </button>
+
+            <button id="nav-tab-commander" onclick="switchTab('tab-commander')" class="flex flex-col items-center gap-1 text-grayText hover:text-white transition-all">
+                <i class="fa-solid fa-robot text-base"></i>
+                <span class="text-[9px] font-bold tracking-wider">КОМАНДИР</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        /* =========================================================================
+           1. APPLICATION STATE & LOCAL STORAGE PERSISTENCY
+           ========================================================================= */
+        let state = {
+            isRegistered: false,
+            registeredUsers: [
+                { email: "test@orion.mil", name: "Андрей", password: "password123", configured: true }
+            ],
+            user: {
+                name: "Андрей",
+                age: 28,
+                gender: "male",
+                height: 180,
+                weight: 78.5,
+                goal: "endurance",
+                level: 12,
+                xp: 1520,
+                xpNextLevel: 2500,
+                streak: 12,
+                rank: "Сержант",
+                callsign: "СПЕКТР-12",
+                codename: "ОПЕРАЦИЯ «СТАЛЬНОЙ КУЛАК»",
+                stats: {
+                    strength: 68,
+                    endurance: 54,
+                    discipline: 82
+                }
+            },
+            dailyMission: {
+                currentDay: 12,
+                totalDays: 28,
+                exercises: [
+                    { id: "pushups", name: "ОТЖИМАНИЯ", target: 15, current: 0, done: false, unit: "ПОВТОРЕНИЙ", tip: "Держите спину ровно, локти под углом 45 градусов. Не торопитесь.", color: "electricBlue" },
+                    { id: "squats", name: "ПРИСЕДАНИЯ", target: 25, current: 0, done: false, unit: "ПОВТОРЕНИЙ", tip: "Опускайтесь до параллели с полом, держите вес на пятках.", color: "cyberAmber" },
+                    { id: "plank", name: "ПЛАНКА", target: 40, current: 0, done: false, unit: "СЕКУНД", tip: "Держите корпус в ровной линии, напрягайте пресс и ягодицы.", color: "neonGreen" },
+                    { id: "leg_raises", name: "ПОДЪЁМ НОГ", target: 15, current: 0, done: false, unit: "ПОВТОРЕНИЙ", tip: "Поднимайте ноги силой пресса, опускайте плавно, не касаясь пола.", color: "purple-500" }
+                ],
+                completed: false
+            },
+            workoutsCount: 18,
+            chatHistory: [
+                { sender: "orion", text: "Здравствуй, Андрей. Твой ранг — Сержант. Твоя дисциплина на высоком уровне. Сегодня нагрузка была оптимальной. Готов к следующему шагу?", time: "09:30" }
+            ],
+            isWorkoutSpeechEnabled: true
+        };
+
+        let selectedPostureBase64 = null;
+        let isCameraActive = false;
+        let videoStream = null;
+        let activeRegTab = 'register';
+
+        // Load saved data if exists
+        function loadAppState() {
+            const savedState = localStorage.getItem("smart_ai_fitness_state_v2");
+            if (savedState) {
+                try {
+                    state = JSON.parse(savedState);
+                } catch (e) {
+                    console.error("Failed to parse app state:", e);
+                }
+            }
+            // Load key
+            const savedKey = localStorage.getItem("gemini_api_key");
+            if (savedKey) {
+                document.getElementById("gemini-key-input").value = savedKey;
+            }
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById("gemini-key-input").value.trim();
+            localStorage.setItem("gemini_api_key", key);
+        }
+
+        function saveAppState() {
+            localStorage.setItem("smart_ai_fitness_state_v2", JSON.stringify(state));
+            updateUI();
+        }
+
+        /* Exponential backoff API fetch utility */
+        async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (response.status === 429 && retries > 0) {
+                    await new Promise(res => setTimeout(res, delay));
+                    return fetchWithRetry(url, options, retries - 1, delay * 2);
+                }
+                return response;
+            } catch (err) {
+                if (retries > 0) {
+                    await new Promise(res => setTimeout(res, delay));
+                    return fetchWithRetry(url, options, retries - 1, delay * 2);
+                }
+                throw err;
+            }
+        }
+
+        /* =========================================================================
+           2. INTERACTIVE UI UPDATING ENGINE
+           ========================================================================= */
+        function updateUI() {
+            document.getElementById("user-display-name").innerText = state.user.name;
+            document.getElementById("user-display-rank").innerText = state.user.rank.toUpperCase();
+            document.getElementById("user-display-lvl").innerText = `Уровень ${state.user.level}`;
+            document.getElementById("user-display-callsign").innerText = state.user.callsign || "СПЕКТР-12";
+            document.getElementById("active-op-codename").innerText = (state.user.codename || "ОПЕРАЦИЯ «СТАЛЬНОЙ КУЛАК»").toUpperCase();
+            
+            document.getElementById("rank-display-title").innerText = state.user.rank.toUpperCase();
+            document.getElementById("lvl-display-title").innerText = `УРОВЕНЬ ${state.user.level}`;
+            
+            document.getElementById("xp-display-text").innerText = state.user.xp;
+            document.getElementById("xp-target-text").innerText = state.user.xpNextLevel;
+            
+            const ring = document.getElementById("xp-progress-ring");
+            const circumference = 578; 
+            const percentXp = Math.min(state.user.xp / state.user.xpNextLevel, 1);
+            ring.style.strokeDashoffset = circumference - (percentXp * circumference);
+
+            document.getElementById("metric-strength").innerText = `${state.user.stats.strength}%`;
+            document.getElementById("metric-bar-strength").style.width = `${state.user.stats.strength}%`;
+            document.getElementById("metric-endurance").innerText = `${state.user.stats.endurance}%`;
+            document.getElementById("metric-bar-endurance").style.width = `${state.user.stats.endurance}%`;
+            document.getElementById("metric-discipline").innerText = `${state.user.stats.discipline}%`;
+            document.getElementById("metric-bar-discipline").style.width = `${state.user.stats.discipline}%`;
+
+            document.getElementById("streak-days-display").innerText = `${state.user.streak} ДНЕЙ`;
+            document.getElementById("stat-streak-display").innerText = `${state.user.streak} дней`;
+
+            document.getElementById("mission-current-day").innerText = state.dailyMission.currentDay;
+            
+            // Re-render exercise list with strict DOM updates
+            const exerciseContainer = document.getElementById("daily-exercises-list");
+            exerciseContainer.innerHTML = "";
+            state.dailyMission.exercises.forEach((ex, idx) => {
+                const accentColor = ex.id === "pushups" ? "electricBlue" : ex.id === "squats" ? "cyberAmber" : ex.id === "plank" ? "neonGreen" : "purple-500";
+                const isDone = ex.done;
+                
+                const card = document.createElement("div");
+                card.id = `ex-card-${idx}`;
+                card.className = `glass-panel rounded-2xl p-3.5 flex items-center justify-between border-l-4 border-l-${accentColor} ${isDone ? 'opacity-60 border-l-neonGreen' : ''}`;
+                
+                let iconClass = "fa-dumbbell";
+                if (ex.id === "squats") iconClass = "fa-person-running";
+                if (ex.id === "plank") iconClass = "fa-clock";
+                if (ex.id === "leg_raises") iconClass = "fa-child";
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-${isDone ? 'neonGreen' : accentColor}/10 flex items-center justify-center text-${isDone ? 'neonGreen' : accentColor} border border-${isDone ? 'neonGreen' : accentColor}/20">
+                            <i class="fa-solid ${iconClass} text-lg"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-sm block">${ex.name}</span>
+                            <span class="text-xs text-grayText">${ex.target} ${ex.unit.toLowerCase()}</span>
+                        </div>
+                    </div>
+                    ${isDone ? `
+                        <button class="px-3.5 py-1.5 bg-neonGreen/20 text-neonGreen border border-neonGreen/40 font-bold text-[10px] rounded-lg tracking-wider uppercase cursor-default">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                    ` : `
+                        <button onclick="startSingleExercise(${idx})" class="px-3.5 py-1.5 bg-${accentColor}/10 hover:bg-${accentColor} text-white hover:text-black border border-${accentColor}/30 hover:border-transparent font-bold text-[10px] rounded-lg tracking-wider uppercase transition">
+                            СТАРТ
+                        </button>
+                    `}
+                `;
+                exerciseContainer.appendChild(card);
+            });
+
+            // Handle Daily Mission Completion Button Enable State
+            const allDone = state.dailyMission.exercises.every(ex => ex.done);
+            const completeBtn = document.getElementById("complete-mission-main-btn");
+            const hint = document.getElementById("mission-completion-hint");
+
+            if (allDone && !state.dailyMission.completed) {
+                completeBtn.className = "w-full py-4 bg-gradient-to-r from-neonGreen to-emerald-600 text-black font-comfortaa font-bold tracking-widest text-sm rounded-2xl flex items-center justify-center gap-2 neo-glow-green cursor-pointer pulse-active";
+                completeBtn.disabled = false;
+                hint.innerText = "Поздравляем! Нажмите кнопку, чтобы завершить миссию.";
+                hint.className = "text-center text-[10px] text-neonGreen mt-2 font-bold uppercase tracking-wider neo-text-glow-green";
+            } else if (state.dailyMission.completed) {
+                completeBtn.className = "w-full py-4 bg-slate-900 text-grayText font-comfortaa font-bold tracking-widest text-sm rounded-2xl flex items-center justify-center gap-2 border border-slate-800 cursor-default opacity-80";
+                completeBtn.disabled = true;
+                completeBtn.innerHTML = `<i class="fa-solid fa-circle-check text-neonGreen"></i> <span>МИССИЯ ВЫПОЛНЕНА</span>`;
+                hint.innerText = "Миссия дня успешно закрыта. Отдыхайте и восстанавливайте силы.";
+                hint.className = "text-center text-[10px] text-grayText mt-2";
+            }
+
+            document.getElementById("stat-workouts-count").innerText = state.workoutsCount;
+            document.getElementById("user-current-weight-val").innerText = `${state.user.weight} кг`;
+
+            const goalTranslations = {
+                "lose": "Сбросить вес",
+                "gain": "Набрать сухую массу",
+                "power": "Максимальная Сила",
+                "endurance": "Экстремальная Выносливость",
+                "maintain": "Поддержание идеальной формы"
+            };
+            document.getElementById("user-goal-mission-subtitle").innerText = `Твоя цель — ${goalTranslations[state.user.goal] || goalTranslations.endurance}`;
+
+            const chatContainer = document.getElementById("chat-messages-container");
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        /* =========================================================================
+           2.1 REGISTRATION, LOGIN & TERMINAL VALIDATION SYSTEM (New)
+           ========================================================================= */
+        function toggleRegTab(tab) {
+            activeRegTab = tab;
+            const regContainer = document.getElementById("reg-form-container");
+            const loginContainer = document.getElementById("login-form-container");
+            const regBtn = document.getElementById("tab-reg-btn");
+            const loginBtn = document.getElementById("tab-login-btn");
+            const actionBtn = document.getElementById("access-action-btn");
+
+            if (tab === 'register') {
+                regContainer.classList.remove("hidden");
+                loginContainer.classList.add("hidden");
+                regBtn.className = "flex-grow py-1.5 text-center rounded-lg bg-electricBlue text-black font-extrabold text-[10px] uppercase neo-glow-blue transition duration-200";
+                loginBtn.className = "flex-grow py-1.5 text-center rounded-lg text-grayText hover:text-white text-[10px] uppercase transition duration-200";
+                actionBtn.querySelector("span").innerText = "ИНИЦИАЛИЗИРОВАТЬ АККАУНТ";
+                validateRegistration();
+            } else {
+                regContainer.classList.add("hidden");
+                loginContainer.classList.remove("hidden");
+                loginBtn.className = "flex-grow py-1.5 text-center rounded-lg bg-electricBlue text-black font-extrabold text-[10px] uppercase neo-glow-blue transition duration-200";
+                regBtn.className = "flex-grow py-1.5 text-center rounded-lg text-grayText hover:text-white text-[10px] uppercase transition duration-200";
+                actionBtn.querySelector("span").innerText = "АВТОРИЗОВАТЬ ДОСТУП";
+                validateLogin();
+            }
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+            } else {
+                input.type = "password";
+            }
+        }
+
+        function validateRegistration() {
+            const email = document.getElementById("reg-email").value.trim();
+            const callsign = document.getElementById("reg-callsign").value.trim();
+            const password = document.getElementById("reg-password").value;
+            const confirm = document.getElementById("reg-confirm").value;
+            const terminal = document.getElementById("terminal-status-log");
+            const actionBtn = document.getElementById("access-action-btn");
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isEmailValid = emailRegex.test(email);
+            const isCallsignValid = callsign.length >= 3;
+            const isPasswordValid = password.length >= 6;
+            const isConfirmMatch = password === confirm && confirm.length > 0;
+
+            // Password Strength Meter
+            const bar1 = document.getElementById("strength-bar-1");
+            const bar2 = document.getElementById("strength-bar-2");
+            const bar3 = document.getElementById("strength-bar-3");
+            const label = document.getElementById("strength-label");
+
+            // Reset indicators
+            bar1.className = "h-1 bg-slate-900 rounded-full flex-grow transition-colors duration-300";
+            bar2.className = "h-1 bg-slate-900 rounded-full flex-grow transition-colors duration-300";
+            bar3.className = "h-1 bg-slate-900 rounded-full flex-grow transition-colors duration-300";
+            label.className = "text-[8px] text-grayText uppercase font-bold tracking-widest";
+            label.innerText = "НЕТ ДАННЫХ";
+
+            if (password.length > 0) {
+                if (password.length < 6) {
+                    bar1.className = "h-1 bg-red-500 rounded-full flex-grow";
+                    label.innerText = "СЛАБЫЙ";
+                    label.className = "text-[8px] text-red-500 uppercase font-bold tracking-widest";
+                } else {
+                    const hasNumbers = /\d/.test(password);
+                    const hasLetters = /[a-zA-Zа-яА-Я]/.test(password);
+                    const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+                    if (hasNumbers && hasLetters && hasSpecial && password.length >= 8) {
+                        bar1.className = "h-1 bg-neonGreen rounded-full flex-grow";
+                        bar2.className = "h-1 bg-neonGreen rounded-full flex-grow";
+                        bar3.className = "h-1 bg-neonGreen rounded-full flex-grow";
+                        label.innerText = "ЭЛИТНЫЙ";
+                        label.className = "text-[8px] text-neonGreen uppercase font-bold tracking-widest neo-text-glow-green";
+                    } else if (hasNumbers && hasLetters) {
+                        bar1.className = "h-1 bg-cyberAmber rounded-full flex-grow";
+                        bar2.className = "h-1 bg-cyberAmber rounded-full flex-grow";
+                        label.innerText = "ОПТИМАЛЬНЫЙ";
+                        label.className = "text-[8px] text-cyberAmber uppercase font-bold tracking-widest";
+                    } else {
+                        bar1.className = "h-1 bg-red-500 rounded-full flex-grow";
+                        label.innerText = "СЛАБЫЙ";
+                        label.className = "text-[8px] text-red-500 uppercase font-bold tracking-widest";
+                    }
+                }
+            }
+
+            // Real-time terminal diagnostic logging
+            if (!isEmailValid && email.length > 0) {
+                terminal.innerHTML = `<span class="text-red-500">[СИГНАЛ ТРЕВОГИ]:</span> Введите корректный тактический E-mail контур.`;
+                disableAccessButton();
+                return;
+            }
+            if (!isCallsignValid && callsign.length > 0) {
+                terminal.innerHTML = `<span class="text-red-500">[СИГНАЛ ТРЕВОГИ]:</span> Позывной рекрута должен быть не менее 3 символов.`;
+                disableAccessButton();
+                return;
+            }
+            if (!isPasswordValid && password.length > 0) {
+                terminal.innerHTML = `<span class="text-red-500">[СИГНАЛ ТРЕВОГИ]:</span> Недостаточная длина крипто-шифра (минимум 6 символов).`;
+                disableAccessButton();
+                return;
+            }
+            if (!isConfirmMatch && confirm.length > 0) {
+                terminal.innerHTML = `<span class="text-red-500">[СИГНАЛ ТРЕВОГИ]:</span> Введенные шифры не совпадают. Повторите ввод.`;
+                disableAccessButton();
+                return;
+            }
+
+            if (isEmailValid && isCallsignValid && isPasswordValid && isConfirmMatch) {
+                terminal.innerHTML = `<span class="text-neonGreen">[ГОТОВНОСТЬ]:</span> Все контуры авторизации синхронизированы. Нажмите инициализацию.`;
+                actionBtn.className = "w-full py-3.5 bg-gradient-to-r from-electricBlue to-blue-600 text-black font-bold tracking-wider rounded-xl text-xs flex items-center justify-center gap-2 neo-glow-blue transition-all cursor-pointer";
+                actionBtn.disabled = false;
+            } else {
+                terminal.innerHTML = `[ОЖИДАНИЕ]: Введите параметры для создания личного профиля воина...`;
+                disableAccessButton();
+            }
+        }
+
+        function validateLogin() {
+            const email = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value;
+            const terminal = document.getElementById("terminal-status-log");
+            const actionBtn = document.getElementById("access-action-btn");
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isEmailValid = emailRegex.test(email);
+            const isPasswordFilled = password.length > 0;
+
+            if (!isEmailValid && email.length > 0) {
+                terminal.innerHTML = `<span class="text-red-500">[СИГНАЛ ТРЕВОГИ]:</span> Некорректный синтаксис военного E-mail.`;
+                disableAccessButton();
+                return;
+            }
+
+            if (isEmailValid && isPasswordFilled) {
+                terminal.innerHTML = `<span class="text-neonGreen">[ГОТОВНОСТЬ]:</span> Контур аутентификации готов к декодированию.`;
+                actionBtn.className = "w-full py-3.5 bg-gradient-to-r from-electricBlue to-blue-600 text-black font-bold tracking-wider rounded-xl text-xs flex items-center justify-center gap-2 neo-glow-blue transition-all cursor-pointer";
+                actionBtn.disabled = false;
+            } else {
+                terminal.innerHTML = `[ОЖИДАНИЕ]: Введите E-mail и пароль для проверки тактического доступа...`;
+                disableAccessButton();
+            }
+        }
+
+        function disableAccessButton() {
+            const actionBtn = document.getElementById("access-action-btn");
+            actionBtn.className = "w-full py-3.5 bg-slate-900 border border-slate-800 text-grayText rounded-xl font-bold tracking-wider transition text-xs flex items-center justify-center gap-2 cursor-not-allowed";
+            actionBtn.disabled = true;
+        }
+
+        function submitAccessForm() {
+            const terminal = document.getElementById("terminal-status-log");
+            
+            if (activeRegTab === 'register') {
+                const email = document.getElementById("reg-email").value.trim();
+                const callsign = document.getElementById("reg-callsign").value.trim();
+                const password = document.getElementById("reg-password").value;
+
+                // Check if user already exists
+                const userExists = state.registeredUsers.some(u => u.email.toLowerCase() === email.toLowerCase());
+                if (userExists) {
+                    terminal.innerHTML = `<span class="text-red-500">[СИГНАЛ ТРЕВОГИ]:</span> E-mail ${email} уже зарегистрирован в базе данных.`;
+                    return;
+                }
+
+                // Register user
+                const newUser = {
+                    email: email,
+                    name: callsign,
+                    password: password,
+                    configured: false,
+                    onboardingData: null
+                };
+                
+                state.registeredUsers.push(newUser);
+                state.isRegistered = true;
+                state.user.name = callsign;
+                state.user.callsign = "РЕКРУТ";
+                state.user.codename = "КАЛИБРОВКА БИОМЕТРИИ";
+
+                terminal.innerHTML = `<span class="text-neonGreen">[СИСТЕМА]:</span> Инициализация аккаунта успешна. Перенаправление...`;
+                
+                setTimeout(() => {
+                    document.getElementById("screen-registration").classList.add("hidden");
+                    document.getElementById("screen-onboarding").classList.remove("hidden");
+                    saveAppState();
+                }, 1000);
+
+            } else {
+                const email = document.getElementById("login-email").value.trim();
+                const password = document.getElementById("login-password").value;
+
+                const matchedUser = state.registeredUsers.find(
+                    u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+                );
+
+                if (matchedUser) {
+                    state.isRegistered = true;
+                    state.user.name = matchedUser.name;
+                    
+                    if (matchedUser.onboardingData) {
+                        state.user = { ...state.user, ...matchedUser.onboardingData };
+                        localStorage.setItem("smart_ai_configured", "true");
+                    } else {
+                        localStorage.removeItem("smart_ai_configured");
+                    }
+
+                    terminal.innerHTML = `<span class="text-neonGreen">[СИСТЕМА]:</span> Доступ авторизован. Приветствуем, воитель ${matchedUser.name}!`;
+
+                    setTimeout(() => {
+                        document.getElementById("screen-registration").classList.add("hidden");
+                        if (matchedUser.configured) {
+                            document.getElementById("screen-onboarding").classList.add("hidden");
+                            switchTab('tab-main');
+                        } else {
+                            document.getElementById("screen-onboarding").classList.remove("hidden");
+                        }
+                        saveAppState();
+                    }, 1000);
+                } else {
+                    terminal.innerHTML = `<span class="text-red-500">[ОШИБКА ДОСТУПА]:</span> Неверный логин или шифр-пароль. Попробуйте еще раз.`;
+                }
+            }
+        }
+
+        /* =========================================================================
+           3. ROUTING & TAB NAVIGATION SYSTEM
+           ========================================================================= */
+        function switchTab(targetTab) {
+            const scrMain = document.getElementById("screen-main");
+            const scrDaily = document.getElementById("screen-daily");
+            const scrPath = document.getElementById("screen-path");
+            const scrProgress = document.getElementById("screen-progress");
+            const scrCommander = document.getElementById("screen-commander");
+
+            const navMain = document.getElementById("nav-tab-main");
+            const navPath = document.getElementById("nav-tab-path");
+            const navProgress = document.getElementById("nav-tab-progress");
+            const navCommander = document.getElementById("nav-tab-commander");
+
+            scrMain.classList.add("hidden");
+            scrDaily.classList.add("hidden");
+            scrPath.classList.add("hidden");
+            scrProgress.classList.add("hidden");
+            scrCommander.classList.add("hidden");
+
+            const navs = [navMain, navPath, navProgress, navCommander];
+            navs.forEach(n => {
+                n.className = "flex flex-col items-center gap-1 text-grayText hover:text-white transition-all";
+            });
+
+            if (targetTab === 'tab-main') {
+                scrMain.classList.remove("hidden");
+                navMain.className = "flex flex-col items-center gap-1 text-electricBlue transition-all neo-text-glow-blue";
+            } else if (targetTab === 'tab-mission-of-day') {
+                scrDaily.classList.remove("hidden");
+                navMain.className = "flex flex-col items-center gap-1 text-electricBlue transition-all neo-text-glow-blue";
+            } else if (targetTab === 'tab-path') {
+                scrPath.classList.remove("hidden");
+                navPath.className = "flex flex-col items-center gap-1 text-electricBlue transition-all neo-text-glow-blue";
+            } else if (targetTab === 'tab-progress') {
+                scrProgress.classList.remove("hidden");
+                navProgress.className = "flex flex-col items-center gap-1 text-electricBlue transition-all neo-text-glow-blue";
+            } else if (targetTab === 'tab-commander') {
+                scrCommander.classList.remove("hidden");
+                navCommander.className = "flex flex-col items-center gap-1 text-electricBlue transition-all neo-text-glow-blue";
+                setTimeout(() => {
+                    const chatContainer = document.getElementById("chat-messages-container");
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 50);
+            }
+        }
+
+        /* =========================================================================
+           4. WORKOUT TRAINING SYSTEM LOGIC (Экран тренировки)
+           ========================================================================= */
+        let activeWorkoutState = {
+            exerciseIndex: 0,
+            currentSet: 1,
+            totalSets: 4,
+            currentRep: 0,
+            targetRep: 15,
+            isTimerActive: false,
+            timerVal: 30,
+            pulseVal: 120,
+            isPaused: false,
+            intervalId: null,
+            pulseIntervalId: null,
+            timerState: "exercise" 
+        };
+
+        function startSingleExercise(index) {
+            const ex = state.dailyMission.exercises[index];
+            if (ex.done) return;
+
+            activeWorkoutState.exerciseIndex = index;
+            activeWorkoutState.currentSet = 1;
+            activeWorkoutState.currentRep = 0;
+            activeWorkoutState.targetRep = ex.target;
+            activeWorkoutState.timerState = "exercise";
+            activeWorkoutState.timerVal = 0; 
+            activeWorkoutState.isPaused = false;
+
+            // Clear posture feedback box upon starting a new workout
+            document.getElementById("posture-mini-feedback").classList.add("hidden");
+
+            document.getElementById("workout-exercise-title").innerText = ex.name;
+            document.getElementById("workout-set-display").innerText = `ПОДХОД 1 ИЗ 4`;
+            document.getElementById("workout-big-counter").innerText = "0";
+            document.getElementById("workout-unit-label").innerText = ex.unit;
+            document.getElementById("workout-done-target-ratio").innerText = `0 / ${ex.target}`;
+            document.getElementById("workout-tip-text").innerText = ex.tip;
+            document.getElementById("workout-rest-timer").innerText = "00:00";
+            document.getElementById("workout-pause-btn").innerHTML = `<i class="fa-solid fa-pause text-base"></i>`;
+
+            const ring = document.getElementById("workout-progress-ring");
+            ring.style.strokeDashoffset = 615;
+
+            synthesizeTacticalSpeech(`Начинаем упражнение: ${ex.name}. Выполните ${ex.target} повторений.`);
+            document.getElementById("screen-workout").classList.remove("hidden");
+
+            startPulseSimulator();
+            startSetStopwatch();
+        }
+
+        function startPulseSimulator() {
+            if (activeWorkoutState.pulseIntervalId) clearInterval(activeWorkoutState.pulseIntervalId);
+            const pulseEl = document.getElementById("workout-pulse-rate");
+            activeWorkoutState.pulseIntervalId = setInterval(() => {
+                if (activeWorkoutState.isPaused) return;
+                const basePulse = activeWorkoutState.timerState === "exercise" ? 130 : 95;
+                const offset = Math.floor(Math.random() * 10) - 5;
+                activeWorkoutState.pulseVal = Math.max(70, Math.min(185, basePulse + offset));
+                pulseEl.innerText = activeWorkoutState.pulseVal;
+            }, 1000);
+        }
+
+        function startSetStopwatch() {
+            if (activeWorkoutState.intervalId) clearInterval(activeWorkoutState.intervalId);
+
+            activeWorkoutState.intervalId = setInterval(() => {
+                if (activeWorkoutState.isPaused) return;
+
+                if (activeWorkoutState.timerState === "exercise") {
+                    activeWorkoutState.timerVal++;
+                    const minutes = Math.floor(activeWorkoutState.timerVal / 60).toString().padStart(2, '0');
+                    const seconds = (activeWorkoutState.timerVal % 60).toString().padStart(2, '0');
+                    document.getElementById("workout-rest-timer").innerText = `${minutes}:${seconds}`;
+                } else if (activeWorkoutState.timerState === "rest") {
+                    if (activeWorkoutState.timerVal > 0) {
+                        activeWorkoutState.timerVal--;
+                        const minutes = Math.floor(activeWorkoutState.timerVal / 60).toString().padStart(2, '0');
+                        const seconds = (activeWorkoutState.timerVal % 60).toString().padStart(2, '0');
+                        document.getElementById("workout-rest-timer").innerText = `${minutes}:${seconds}`;
+                        
+                        if (activeWorkoutState.timerVal <= 3 && activeWorkoutState.timerVal > 0) {
+                            synthesizeTacticalSpeech(activeWorkoutState.timerVal.toString());
+                        }
+                    } else {
+                        clearInterval(activeWorkoutState.intervalId);
+                        activeWorkoutState.timerState = "exercise";
+                        activeWorkoutState.timerVal = 0;
+                        activeWorkoutState.currentRep = 0;
+                        
+                        document.getElementById("workout-big-counter").innerText = "0";
+                        document.getElementById("workout-done-target-ratio").innerText = `0 / ${activeWorkoutState.targetRep}`;
+                        document.getElementById("workout-set-display").innerText = `ПОДХОД ${activeWorkoutState.currentSet} ИЗ 4`;
+                        document.getElementById("workout-rest-timer").innerText = "00:00";
+                        
+                        const ring = document.getElementById("workout-progress-ring");
+                        ring.style.strokeDashoffset = 615;
+
+                        synthesizeTacticalSpeech(`Подход ${activeWorkoutState.currentSet}. К бою.`);
+                        startSetStopwatch();
+                    }
+                }
+            }, 1000);
+        }
+
+        function incrementWorkoutRep() {
+            if (activeWorkoutState.isPaused) return;
+            if (activeWorkoutState.timerState !== "exercise") return;
+
+            const target = activeWorkoutState.targetRep;
+            if (activeWorkoutState.currentRep < target) {
+                activeWorkoutState.currentRep++;
+                
+                if (activeWorkoutState.currentRep === target) {
+                    synthesizeTacticalSpeech("Отлично. Цель достигнута.");
+                } else if (activeWorkoutState.currentRep % 5 === 0) {
+                    synthesizeTacticalSpeech(`${activeWorkoutState.currentRep}`);
+                }
+
+                document.getElementById("workout-big-counter").innerText = activeWorkoutState.currentRep;
+                document.getElementById("workout-done-target-ratio").innerText = `${activeWorkoutState.currentRep} / ${target}`;
+
+                const ring = document.getElementById("workout-progress-ring");
+                const progressRatio = activeWorkoutState.currentRep / target;
+                ring.style.strokeDashoffset = 615 - (progressRatio * 615);
+
+                if (activeWorkoutState.currentRep >= target) {
+                    setTimeout(() => {
+                        triggerSetFinishedTransition();
+                    }, 500);
+                }
+            }
+        }
+
+        function triggerSetFinishedTransition() {
+            if (activeWorkoutState.currentSet < activeWorkoutState.totalSets) {
+                activeWorkoutState.currentSet++;
+                activeWorkoutState.timerState = "rest";
+                activeWorkoutState.timerVal = 30; 
+                
+                document.getElementById("workout-set-display").innerText = `ВРЕМЯ ОТДЫХА`;
+                document.getElementById("workout-big-counter").innerText = "REST";
+                document.getElementById("workout-done-target-ratio").innerText = `Наберитесь сил`;
+                
+                synthesizeTacticalSpeech("Подход завершен. Отдых тридцать секунд.");
+            } else {
+                finishWorkoutExercise();
+            }
+        }
+
+        function finishWorkoutExercise() {
+            if (activeWorkoutState.intervalId) clearInterval(activeWorkoutState.intervalId);
+            if (activeWorkoutState.pulseIntervalId) clearInterval(activeWorkoutState.pulseIntervalId);
+
+            const index = activeWorkoutState.exerciseIndex;
+            state.dailyMission.exercises[index].done = true;
+            
+            state.user.stats.strength = Math.min(100, state.user.stats.strength + 2);
+            state.user.stats.endurance = Math.min(100, state.user.stats.endurance + 1);
+            state.user.stats.discipline = Math.min(100, state.user.stats.discipline + 3);
+
+            document.getElementById("screen-workout").classList.add("hidden");
+            synthesizeTacticalSpeech("Упражнение успешно выполнено. Возвращаемся в штаб.");
+
+            saveAppState();
+        }
+
+        function toggleWorkoutPause() {
+            activeWorkoutState.isPaused = !activeWorkoutState.isPaused;
+            const btn = document.getElementById("workout-pause-btn");
+            if (activeWorkoutState.isPaused) {
+                btn.innerHTML = `<i class="fa-solid fa-play text-base text-neonGreen"></i>`;
+                synthesizeTacticalSpeech("Пауза");
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-pause text-base"></i>`;
+                synthesizeTacticalSpeech("Продолжаем");
+            }
+        }
+
+        function toggleWorkoutSpeech() {
+            state.isWorkoutSpeechEnabled = !state.isWorkoutSpeechEnabled;
+            const icon = document.getElementById("workout-audio-icon");
+            if (state.isWorkoutSpeechEnabled) {
+                icon.className = "fa-solid fa-volume-high text-xs";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-xs text-red-500";
+            }
+        }
+
+        function exitActiveWorkout() {
+            if (activeWorkoutState.intervalId) clearInterval(activeWorkoutState.intervalId);
+            if (activeWorkoutState.pulseIntervalId) clearInterval(activeWorkoutState.pulseIntervalId);
+            document.getElementById("screen-workout").classList.add("hidden");
+        }
+
+        /* =========================================================================
+           5. POSTURE ANALYSIS FLOW (ИИ КОНТРОЛЬ ОСАНКИ)
+           ========================================================================= */
+        function openPostureModal() {
+            document.getElementById("modal-posture-checker").classList.remove("hidden");
+            selectedPostureBase64 = null;
+            document.getElementById("posture-preview-img").classList.add("hidden");
+            document.getElementById("posture-placeholder").classList.remove("hidden");
+        }
+
+        function closePostureModal() {
+            stopCameraStream();
+            document.getElementById("modal-posture-checker").classList.add("hidden");
+        }
+
+        function selectPostureTemplate(templateType) {
+            stopCameraStream();
+            let svgMarkup = "";
+            if (templateType === 'good_pushup') {
+                svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" width="100%" height="100%" class="bg-slate-900">
+                    <line x1="10" y1="80" x2="150" y2="80" stroke="#1e293b" stroke-width="4"/>
+                    <!-- Perfectly straight line representing proper pushup plank posture -->
+                    <line x1="25" y1="50" x2="135" y2="70" stroke="#39FF88" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="25" cy="50" r="8" fill="#00D4FF"/>
+                    <circle cx="135" cy="70" r="6" fill="#00D4FF"/>
+                    <text x="40" y="30" fill="#39FF88" font-family="monospace" font-size="10" font-weight="bold">ALIGNMENT: 100% CORRECT</text>
+                </svg>`;
+            } else if (templateType === 'bad_squat') {
+                svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" width="100%" height="100%" class="bg-slate-900">
+                    <line x1="10" y1="80" x2="150" y2="80" stroke="#1e293b" stroke-width="4"/>
+                    <!-- Round back/spine squat error -->
+                    <path d="M 50 20 Q 80 40, 50 75" fill="none" stroke="#FFB800" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="50" cy="20" r="8" fill="#FFB800"/>
+                    <text x="40" y="15" fill="#FFB800" font-family="monospace" font-size="9" font-weight="bold">WARNING: ROUNDED SPINE DETECTED</text>
+                </svg>`;
+            } else { // bad_plank
+                svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" width="100%" height="100%" class="bg-slate-900">
+                    <line x1="10" y1="80" x2="150" y2="80" stroke="#1e293b" stroke-width="4"/>
+                    <!-- Sagging posture representation -->
+                    <path d="M 25 45 Q 80 75, 135 45" fill="none" stroke="#ef4444" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="80" cy="60" r="6" fill="#ef4444"/>
+                    <text x="35" y="25" fill="#ef4444" font-family="monospace" font-size="9" font-weight="bold">ERROR: SAGGING LUMBAR REGION</text>
+                </svg>`;
+            }
+
+            const base64Str = btoa(unescape(encodeURIComponent(svgMarkup)));
+            selectedPostureBase64 = base64Str;
+            
+            const imgEl = document.getElementById("posture-preview-img");
+            imgEl.src = `data:image/svg+xml;base64,${base64Str}`;
+            imgEl.classList.remove("hidden");
+            document.getElementById("posture-placeholder").classList.add("hidden");
+        }
+
+        async function startCameraCapture() {
+            const video = document.getElementById("posture-webcam");
+            const btn = document.getElementById("posture-camera-trigger-btn");
+            
+            if (isCameraActive) {
+                // Take Snapshot
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const base64Data = canvas.toDataURL("image/jpeg").split(",")[1];
+                selectedPostureBase64 = base64Data;
+                
+                const previewImg = document.getElementById("posture-preview-img");
+                previewImg.src = `data:image/jpeg;base64,${base64Data}`;
+                previewImg.classList.remove("hidden");
+                video.classList.add("hidden");
+                document.getElementById("posture-placeholder").classList.add("hidden");
+                
+                stopCameraStream();
+                btn.innerHTML = `<i class="fa-solid fa-camera mr-1"></i> Запустить Камеру`;
+            } else {
+                try {
+                    videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                    video.srcObject = videoStream;
+                    video.classList.remove("hidden");
+                    document.getElementById("posture-placeholder").classList.add("hidden");
+                    document.getElementById("posture-preview-img").classList.add("hidden");
+                    isCameraActive = true;
+                    btn.innerHTML = `<i class="fa-solid fa-circle-dot text-red-500 mr-1 animate-ping"></i> Сделать снимок`;
+                } catch (err) {
+                    console.error("Camera access denied: ", err);
+                    synthesizeTacticalSpeech("Помехи подключения камеры. Выберите тактический шаблон или файл.");
+                }
+            }
+        }
+
+        function stopCameraStream() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            isCameraActive = false;
+            document.getElementById("posture-webcam").classList.add("hidden");
+            document.getElementById("posture-camera-trigger-btn").innerHTML = `<i class="fa-solid fa-camera mr-1"></i> Камера`;
+        }
+
+        function handlePostureFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result.split(",")[1];
+                selectedPostureBase64 = base64Data;
+                
+                const previewImg = document.getElementById("posture-preview-img");
+                previewImg.src = e.target.result;
+                previewImg.classList.remove("hidden");
+                document.getElementById("posture-placeholder").classList.add("hidden");
+                stopCameraStream();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function runPostureAnalysis() {
+            if (!selectedPostureBase64) {
+                synthesizeTacticalSpeech("Отставить. Загрузите фото или выберите тактический шаблон для расшифровки.");
+                return;
+            }
+
+            const keyInput = document.getElementById("gemini-key-input").value.trim();
+            const exName = state.dailyMission.exercises[activeWorkoutState.exerciseIndex].name;
+            const btn = document.getElementById("btn-posture-analyze");
+            
+            btn.innerHTML = `<i class="fa-solid fa-gear animate-spin mr-1"></i> ТАКТИЧЕСКИЙ ДЕШИФР...`;
+            btn.disabled = true;
+
+            const systemPrompt = `Ты — Командир ORION, строгий тактический наставник в SMART_AI FITNESS. 
+Твоя задача — проанализировать осанку пользователя на фото по упражнению "${exName}" и выдать критический фидбек.
+Используй строгий армейский тон. Укажи на ошибки (если это неправильный шаблон) или похвали за идеальную геометрию. Ограничься 2 краткими тактическими абзацами на русском языке.`;
+
+            let feedbackText = "";
+            if (keyInput) {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${keyInput}`;
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [
+                            { text: `Проанализируй геометрию тела и осанку на этом изображении при выполнении упражнения: ${exName}. Предоставь рапорт.` },
+                            {
+                                inlineData: {
+                                    mimeType: "image/png",
+                                    data: selectedPostureBase64
+                                }
+                            }
+                        ]
+                    }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                try {
+                    const response = await fetchWithRetry(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    feedbackText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Связь потеряна. Ошибка декодирования ИИ-рапорта.";
+                } catch (err) {
+                    console.error("Gemini Vision API error: ", err);
+                    feedbackText = "ИИ Орион: В тактическом канале помехи. Осанка выглядит приемлемо, продолжай движение в строгом темпе!";
+                }
+            } else {
+                // Local intelligent fallback simulation based on selected template
+                await new Promise(res => setTimeout(res, 2000)); // Cool delay simulation
+                if (selectedPostureBase64 && selectedPostureBase64.length < 500) { // Schematic SVGs
+                    feedbackText = "ИИ Командир Орион: Рапорт расшифрован. Угол бедер в приседе равен 90 градусам. Осанка прямая. Фиксирую идеальное распределение нагрузок. Выполняй упражнение по этой траектории.";
+                } else {
+                    feedbackText = "ИИ Командир Орион: Выполняю поверхностную калибровку. Лопатки сведены, спина удерживает боевую ось. Нареканий не обнаружено. Продолжай работу!";
+                }
+            }
+
+            btn.innerHTML = `НАЧАТЬ ИИ-ДЕШИФРОВКУ`;
+            btn.disabled = false;
+
+            // Render output inside training screen & close modal
+            const minifeedback = document.getElementById("posture-mini-feedback");
+            minifeedback.innerHTML = `<span class="text-electricBlue font-bold uppercase tracking-widest block mb-1">Рапорт Ориона по форме:</span> ${feedbackText}`;
+            minifeedback.classList.remove("hidden");
+            
+            closePostureModal();
+            synthesizeTacticalSpeech("ИИ-дешифровка завершена. Рапорт Ориона готов.");
+        }
+
+        /* =========================================================================
+           6. RPG MISSION COMPLETE & REWARDS
+           ========================================================================= */
+        async function triggerCompleteMission() {
+            if (state.dailyMission.completed) return;
+
+            state.dailyMission.completed = true;
+            state.workoutsCount++;
+            
+            // Add Experience
+            addExperiencePoints(125);
+            state.user.streak++;
+
+            // Reveal Success overlay
+            document.getElementById("popup-success-glow").classList.remove("hidden");
+            
+            // Call Gemini to generate a tailored Post-Workout AI debrief
+            await generateAISessionDebrief();
+            
+            saveAppState();
+        }
+
+        async function generateAISessionDebrief() {
+            const keyInput = document.getElementById("gemini-key-input").value.trim();
+            const loader = document.getElementById("ai-debrief-loader");
+            const textEl = document.getElementById("ai-debrief-text");
+
+            loader.classList.remove("hidden");
+            textEl.innerText = "Формируем тактический отчет...";
+
+            const userPrompt = `Напиши строгий армейский рапорт Командира Ориона для бойца по имени ${state.user.name}.
+            Он только что завершил Миссию Дня №${state.dailyMission.currentDay}. 
+            Текущие показатели: Сила ${state.user.stats.strength}%, Выносливость ${state.user.stats.endurance}%, Дисциплина ${state.user.stats.discipline}%.
+            Ограничься 2-3 лаконичными мотивирующими предложениями на русском языке.`;
+
+            let debriefText = "";
+            if (keyInput) {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${keyInput}`;
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }]
+                };
+
+                try {
+                    const response = await fetchWithRetry(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    debriefText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Рапорт поврежден при передаче.";
+                } catch (err) {
+                    debriefText = "Отличный бой, Сержант. Твоя боеспособность возросла. Дисциплина укреплена на 5%. Готовься к следующей десантной нагрузке завтра.";
+                }
+            } else {
+                await new Promise(res => setTimeout(res, 1500));
+                debriefText = `Боец ${state.user.name}, рапорт готов. Дисциплина возросла до ${state.user.stats.discipline}%. Коэффициент полезного действия равен 95%. Отличный бой, Сержант. Отбой!`;
+            }
+
+            loader.classList.add("hidden");
+            textEl.innerText = debriefText;
+            synthesizeTacticalSpeech(debriefText.replace(/[^\w\sа-яА-ЯёЁ,.!?]/g, ''));
+        }
+
+        function addExperiencePoints(xpAmount) {
+            state.user.xp += xpAmount;
+            if (state.user.xp >= state.user.xpNextLevel) {
+                state.user.xp -= state.user.xpNextLevel;
+                state.user.level++;
+                state.user.xpNextLevel = Math.round(state.user.xpNextLevel * 1.2);
+                state.user.rank = calculateRankTitle(state.user.level);
+
+                setTimeout(() => {
+                    synthesizeTacticalSpeech(`Внимание! Достигнут новый уровень. Поздравляем, теперь вы: ${state.user.rank}`);
+                }, 1500);
+            }
+        }
+
+        function calculateRankTitle(level) {
+            if (level >= 30) return "Генерал";
+            if (level >= 28) return "Полковник";
+            if (level >= 24) return "Майор";
+            if (level >= 20) return "Капитан";
+            if (level >= 16) return "Лейтенант";
+            if (level >= 12) return "Сержант";
+            if (level >= 8) return "Солдат";
+            return "Новобранец";
+        }
+
+        function closeSuccessPopup() {
+            document.getElementById("popup-success-glow").classList.add("hidden");
+            switchTab('tab-main');
+        }
+
+        /* =========================================================================
+           7. SPEECH SYNTHESIS ENGINE (Web Audio or Browser native TTS)
+           ========================================================================= */
+        function synthesizeTacticalSpeech(text) {
+            if (!state.isWorkoutSpeechEnabled) return;
+            try {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ru-RU';
+                    utterance.pitch = 0.75; 
+                    utterance.rate = 1.05;
+                    window.speechSynthesis.speak(utterance);
+                }
+            } catch (err) {
+                console.warn("Speech synthesis error: ", err);
+            }
+        }
+
+        /* =========================================================================
+           8. AI CHATBOT ENGINE - REAL GEMINI API & SMART LOCALISED FALLBACKS
+           ========================================================================= */
+        async function sendUserMessage() {
+            const inputField = document.getElementById("chat-input-field");
+            const userText = inputField.value.trim();
+            if (!userText) return;
+
+            inputField.value = "";
+            appendMessageToContainer("Вы", userText, true);
+
+            const chatContainer = document.getElementById("chat-messages-container");
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            const loadingId = appendLoaderToContainer();
+            const keyInput = document.getElementById("gemini-key-input").value.trim();
+            
+            let responseText = "";
+            if (keyInput) {
+                responseText = await callGeminiAPI(keyInput, userText);
+            } else {
+                responseText = generateOfflineOrionResponse(userText);
+            }
+
+            removeLoaderFromContainer(loadingId);
+            appendMessageToContainer("ORION", responseText, false);
+            synthesizeTacticalSpeech(responseText.replace(/[^\w\sа-яА-ЯёЁ,.!?]/g, ''));
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendUserMessage();
+            }
+        }
+
+        function sendQuickReply(text) {
+            document.getElementById("chat-input-field").value = text;
+            sendUserMessage();
+        }
+
+        function appendMessageToContainer(sender, text, isUser) {
+            const container = document.getElementById("chat-messages-container");
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const msgBlock = document.createElement("div");
+            if (isUser) {
+                msgBlock.className = "flex flex-col space-y-1 max-w-[85%] self-end items-end ml-auto text-right";
+                msgBlock.innerHTML = `
+                    <span class="text-[9px] text-neonGreen uppercase font-bold pr-2">ВЫ</span>
+                    <div class="bg-gradient-to-r from-blue-950 to-slate-900 border border-slate-800 p-3 rounded-2xl rounded-tr-none text-white text-left">
+                        ${text}
+                    </div>
+                    <span class="text-[8px] text-grayText pr-2">${timeStr}</span>
+                `;
+            } else {
+                msgBlock.className = "flex flex-col space-y-1 max-w-[85%] self-start";
+                msgBlock.innerHTML = `
+                    <span class="text-[9px] text-electricBlue uppercase font-bold pl-2">${sender}</span>
+                    <div class="glass-panel p-3 rounded-2xl rounded-tl-none border border-slate-800 text-white">
+                        ${text}
+                    </div>
+                    <span class="text-[8px] text-grayText pl-2">${timeStr}</span>
+                `;
+            }
+
+            container.appendChild(msgBlock);
+            
+            state.chatHistory.push({ sender: isUser ? "user" : "orion", text: text, time: timeStr });
+            localStorage.setItem("smart_ai_fitness_state_v2", JSON.stringify(state));
+        }
+
+        function appendLoaderToContainer() {
+            const container = document.getElementById("chat-messages-container");
+            const loaderId = "orion-loader-" + Date.now();
+            
+            const loaderBlock = document.createElement("div");
+            loaderBlock.id = loaderId;
+            loaderBlock.className = "flex flex-col space-y-1 max-w-[85%] self-start";
+            loaderBlock.innerHTML = `
+                <span class="text-[9px] text-electricBlue uppercase font-bold pl-2">ORION</span>
+                <div class="glass-panel p-3 rounded-2xl rounded-tl-none border border-slate-800 text-white flex gap-1 items-center">
+                    <span class="w-1.5 h-1.5 bg-electricBlue rounded-full animate-bounce"></span>
+                    <span class="w-1.5 h-1.5 bg-electricBlue rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-1.5 h-1.5 bg-electricBlue rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                </div>
+            `;
+            container.appendChild(loaderBlock);
+            return loaderId;
+        }
+
+        function removeLoaderFromContainer(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        async function callGeminiAPI(apiKey, prompt) {
+            const systemPrompt = `Ты — ORION, искусственный интеллект, суровый, но справедливый цифровой Командир тактического фитнес-приложения SMART_AI FITNESS. 
+Обращайся к пользователю по имени ${state.user.name}. Твоя цель — сделать его воином. Используй военную терминологию: "миссия", "дисциплина", "ранг", "нагрузка". 
+Пользователь сейчас имеет уровень ${state.user.level}, ранг ${state.user.rank}, сила ${state.user.stats.strength}%, выносливость ${state.user.stats.endurance}%, дисциплина ${state.user.stats.discipline}%. 
+Отвечай лаконично (максимум 2-3 емких абзаца). Если он устал, уменьши нагрузку. Давай ценные тактические фитнес-советы.`;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text || "Ошибка декодирования боевого канала.";
+            } catch (err) {
+                return "Обнаружены серьезные помехи. Мой совет: тренируйся до отказа и держи осанку прямо!";
+            }
+        }
+
+        function generateOfflineOrionResponse(inputText) {
+            const text = inputText.toLowerCase();
+            if (text.includes("устал") || text.includes("энерг") || text.includes("слаб")) {
+                state.dailyMission.exercises.forEach(ex => {
+                    ex.target = Math.max(5, ex.target - 2);
+                });
+                saveAppState();
+                return `Принято, боец ${state.user.name}. Физическая усталость — это естественный барьер. Я скорректировал твою боевую нагрузку на завтра на 15%. Сделай упор на идеальную технику и растяжку.`;
+            }
+            if (text.includes("план") || text.includes("завтра") || text.includes("трениров")) {
+                return `Твой план на завтра готов. Мы повысим твои характеристики силы. В планах: 18 Отжиманий, 30 Приседаний, 45 секунд планки. Сделай замеры пульса.`;
+            }
+            return `Рапорт принят, Андрей. Твой ранг Сержант подтвержден. Твои показатели дисциплины равны ${state.user.stats.discipline}%. Не давай лени ни единого шанса пробить твою оборону.`;
+        }
+
+        /* =========================================================================
+           9. ONBOARDING SETUP & INTERACTIVE CONFIGURATION (STRUCTURAL GEMINI LLM CALL)
+           ========================================================================= */
+        function showOnboarding(forceShow = false) {
+            const regScreen = document.getElementById("screen-registration");
+            const onb = document.getElementById("screen-onboarding");
+            
+            if (!state.isRegistered) {
+                regScreen.classList.remove("hidden");
+                onb.classList.add("hidden");
+                return;
+            }
+
+            regScreen.classList.add("hidden");
+
+            if (forceShow) {
+                document.getElementById("ob-name").value = state.user.name;
+                document.getElementById("ob-age").value = state.user.age;
+                document.getElementById("ob-weight").value = state.user.weight;
+                document.getElementById("ob-height").value = state.user.height;
+                document.getElementById("ob-gender").value = state.user.gender;
+                document.getElementById("ob-goal").value = state.user.goal;
+                onb.classList.remove("hidden");
+            } else {
+                const isConfigured = localStorage.getItem("smart_ai_configured");
+                if (!isConfigured) {
+                    onb.classList.remove("hidden");
+                }
+            }
+        }
+
+        async function submitOnboarding() {
+            const name = document.getElementById("ob-name").value.trim() || "Андрей";
+            const age = parseInt(document.getElementById("ob-age").value) || 28;
+            const weight = parseFloat(document.getElementById("ob-weight").value) || 78;
+            const height = parseInt(document.getElementById("ob-height").value) || 180;
+            const gender = document.getElementById("ob-gender").value;
+            const goal = document.getElementById("ob-goal").value;
+            const trainingLvl = document.getElementById("ob-level").value;
+
+            // Trigger Fullscreen AI Loader overlay
+            const aiLoader = document.getElementById("ai-onboarding-loader");
+            aiLoader.classList.remove("hidden");
+
+            const apiKey = document.getElementById("gemini-key-input").value.trim();
+
+            let resultJson = null;
+
+            if (apiKey) {
+                const systemPrompt = "You are ORION, a strict tactical military AI fitness trainer. Generate a custom fit program plan. Output MUST be in Russian language and formatted strictly according to the requested JSON schema.";
+                const userPrompt = `Generate a customized 4-exercise tactical workout plan for:
+                Name: ${name}, Age: ${age}, Weight: ${weight}kg, Height: ${height}cm, Gender: ${gender}, Goal: ${goal}, Level: ${trainingLvl}.
+                You must return a JSON block with codename (Operational name, e.g. "Стальной Кулак"), callsign (Tactical title, e.g. "СПЕКТР-12"), description (Brief combat strategy), and a list of exactly 4 exercises. Use ids: "pushups", "squats", "plank", "leg_raises". Target reps/duration must be integers suitable for their training level.`;
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                codename: { type: "STRING" },
+                                callsign: { type: "STRING" },
+                                description: { type: "STRING" },
+                                exercises: {
+                                    type: "ARRAY",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            id: { type: "STRING" },
+                                            name: { type: "STRING" },
+                                            target: { type: "NUMBER" },
+                                            unit: { type: "STRING" },
+                                            tip: { type: "STRING" }
+                                        },
+                                        required: ["id", "name", "target", "unit", "tip"]
+                                    }
+                                }
+                            },
+                            required: ["codename", "callsign", "description", "exercises"]
+                        }
+                    }
+                };
+
+                try {
+                    const response = await fetchWithRetry(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const resData = await response.json();
+                    const text = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        resultJson = JSON.parse(text);
+                    }
+                } catch (e) {
+                    console.error("Gemini structured parsing error: ", e);
+                }
+            }
+
+            // Fallback mock JSON generator if no key/failed connection
+            if (!resultJson) {
+                await new Promise(res => setTimeout(res, 2200)); 
+                resultJson = {
+                    codename: "ОПЕРАЦИЯ «СТАЛЬНОЙ ЦИКЛОН»",
+                    callsign: "РЕЙДЕР-9",
+                    description: "Комплексная тактическая проработка всех скелетных мускулов с акцентом на выносливость.",
+                    exercises: [
+                        { id: "pushups", name: "ОТЖИМАНИЯ", target: 15, unit: "ПОВТОРЕНИЙ", tip: "Держите спину ровно, локти под углом 45 градусов. Контролируйте опускание." },
+                        { id: "squats", name: "ПРИСЕДАНИЯ", target: 25, unit: "ПОВТОРЕНИЙ", tip: "Опускайтесь до параллели с полом, распределяйте вес на пятки." },
+                        { id: "plank", name: "ПЛАНКА", target: 40, unit: "СЕКУНД", tip: "Удерживайте корпус в идеальной плоскости, напрягая все мышцы кора." },
+                        { id: "leg_raises", name: "ПОДЪЁМ НОГ", target: 15, unit: "ПОВТОРЕНИЙ", tip: "Опускайте ноги плавно, держите колени сомкнутыми, не касаясь пола." }
+                    ]
+                };
+            }
+
+            // Write results to state
+            state.user.name = name;
+            state.user.age = age;
+            state.user.weight = weight;
+            state.user.height = height;
+            state.user.gender = gender;
+            state.user.goal = goal;
+            state.user.callsign = resultJson.callsign;
+            state.user.codename = resultJson.codename;
+
+            state.dailyMission.exercises = resultJson.exercises.map(ex => {
+                let color = "electricBlue";
+                if (ex.id === "squats") color = "cyberAmber";
+                if (ex.id === "plank") color = "neonGreen";
+                if (ex.id === "leg_raises") color = "purple-500";
+                
+                return {
+                    id: ex.id,
+                    name: ex.name,
+                    target: ex.target,
+                    current: 0,
+                    done: false,
+                    unit: ex.unit,
+                    tip: ex.tip,
+                    color: color
+                };
+            });
+
+            state.dailyMission.completed = false;
+            state.user.level = 12;
+            state.user.xp = 1520;
+            state.user.rank = calculateRankTitle(state.user.level);
+
+            localStorage.setItem("smart_ai_configured", "true");
+            
+            // Save configured state in the registered account locally
+            const activeEmail = document.getElementById("reg-email").value.trim() || document.getElementById("login-email").value.trim();
+            const userIndex = state.registeredUsers.findIndex(u => u.email.toLowerCase() === activeEmail.toLowerCase());
+            if (userIndex !== -1) {
+                state.registeredUsers[userIndex].configured = true;
+                state.registeredUsers[userIndex].onboardingData = {
+                    age: age,
+                    weight: weight,
+                    height: height,
+                    gender: gender,
+                    goal: goal,
+                    callsign: resultJson.callsign,
+                    codename: resultJson.codename
+                };
+            }
+
+            // Hide Loader & onboarding
+            aiLoader.classList.add("hidden");
+            document.getElementById("screen-onboarding").classList.add("hidden");
+
+            synthesizeTacticalSpeech(`Программа составлена. Активирована операция: ${resultJson.codename}. Твой позывной: ${resultJson.callsign}.`);
+
+            saveAppState();
+            switchTab('tab-main');
+        }
+
+        function resetAppProgress() {
+            localStorage.clear();
+            state = {
+                isRegistered: false,
+                registeredUsers: [
+                    { email: "test@orion.mil", name: "Андрей", password: "password123", configured: true }
+                ],
+                user: {
+                    name: "Андрей",
+                    age: 28,
+                    gender: "male",
+                    height: 180,
+                    weight: 78.5,
+                    goal: "endurance",
+                    level: 12,
+                    xp: 1520,
+                    xpNextLevel: 2500,
+                    streak: 12,
+                    rank: "Сержант",
+                    callsign: "СПЕКТР-12",
+                    codename: "ОПЕРАЦИЯ «СТАЛЬНОЙ КУЛАК»",
+                    stats: {
+                        strength: 68,
+                        endurance: 54,
+                        discipline: 82
+                    }
+                },
+                dailyMission: {
+                    currentDay: 12,
+                    totalDays: 28,
+                    exercises: [
+                        { id: "pushups", name: "ОТЖИМАНИЯ", target: 15, current: 0, done: false, unit: "ПОВТОРЕНИЙ", tip: "Держите спину ровно, локти под углом 45 градусов. Не торопитесь.", color: "electricBlue" },
+                        { id: "squats", name: "ПРИСЕДАНИЯ", target: 25, current: 0, done: false, unit: "ПОВТОРЕНИЙ", tip: "Опускайтесь до параллели с полом, держите вес на пятках.", color: "cyberAmber" },
+                        { id: "plank", name: "ПЛАНКА", target: 40, current: 0, done: false, unit: "СЕКУНД", tip: "Держите корпус в ровной линии, напрягайте пресс.", color: "neonGreen" },
+                        { id: "leg_raises", name: "ПОДЪЁМ НОГ", target: 15, current: 0, done: false, unit: "ПОВТОРЕНИЙ", tip: "Поднимайте силой пресса, опускайте плавно.", color: "purple-500" }
+                    ],
+                    completed: false
+                },
+                workoutsCount: 18,
+                chatHistory: [
+                    { sender: "orion", text: "Здравствуй, Андрей. Твой ранг — Сержант. Твоя Дисциплина на высоком уровне. Сегодня нагрузка была оптимальной. Готов к следующему шагу?", time: "09:30" }
+                ],
+                isWorkoutSpeechEnabled: true
+            };
+            
+            // Clear inputs
+            document.getElementById("reg-email").value = "";
+            document.getElementById("reg-callsign").value = "";
+            document.getElementById("reg-password").value = "";
+            document.getElementById("reg-confirm").value = "";
+            document.getElementById("login-email").value = "";
+            document.getElementById("login-password").value = "";
+
+            document.getElementById("chat-messages-container").innerHTML = "";
+            appendMessageToContainer("ORION", state.chatHistory[0].text, false);
+
+            showOnboarding();
+        }
+
+        function showRankRequirement(title, level, reward) {
+            const toast = document.getElementById("rank-requirement-toast");
+            document.getElementById("req-title").innerText = title;
+            document.getElementById("req-lvl").innerText = `${level} уровень`;
+            document.getElementById("req-reward").innerText = reward;
+            
+            toast.classList.remove("hidden");
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 4500);
+        }
+
+        /* =========================================================================
+           10. INITIALIZATION ON WINDOW LOAD
+           ========================================================================= */
+        window.onload = function() {
+            loadAppState();
+            showOnboarding();
+            updateUI();
+        }
+    </script>
+</body>
+</html>
